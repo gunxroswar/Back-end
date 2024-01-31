@@ -14,8 +14,8 @@ import lombok.Setter;
 public class PostStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "POSTSTATUSID")
-    private Long notificationStatusID;
-    @Column(name = "POSTSTATUSNAME")
+    private Long postStatusID;
+    @Column(nullable = false)
     private String postStatusName;
+
 }

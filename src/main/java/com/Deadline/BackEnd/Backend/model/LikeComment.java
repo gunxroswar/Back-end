@@ -14,10 +14,10 @@ import lombok.Setter;
 public class LikeComment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
+
     private Long id;
-    @Column(name = "COMMENTID")
+    @Column(nullable = false)
     private Long commentID;
-    @Column(name="USERID")
+    @Column(nullable = false)
     private  Long UID;
 }

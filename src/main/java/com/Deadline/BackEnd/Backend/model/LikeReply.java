@@ -14,10 +14,10 @@ import lombok.Setter;
 public class LikeReply {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
+
     private Long id;
-    @Column(name = "REPLYID")
-    private Long REPLYID;
-    @Column(name="USERID")
-    private  Long UID;
+    @Column(nullable = false)
+    private Long replyID;
+    @Column(nullable = false)
+    private  Long uid;
 }

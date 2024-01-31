@@ -13,14 +13,14 @@ import lombok.Setter;
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "NOTIFICATIONID")
-    private Long NID;
-    @Column(name = "DETAIL")
+
+    private Long notificationID;
+    @Column(nullable = false)
     private String detail;
 
-    @Column( name = "STATUS" )
+    @Column(nullable = false)
     private Long statusID;
 
-    @Column(name= "REFERENCE")
+    @Column(nullable = false)
     private  String reference;
 }

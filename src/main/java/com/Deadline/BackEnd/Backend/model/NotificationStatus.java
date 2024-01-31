@@ -13,8 +13,8 @@ import lombok.Setter;
 public class NotificationStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "NOTIFICATIONSTATUSID")
+
     private Long notificationstatusID;
-    @Column(name = "NOTIFICATIONSTATUSNAME")
+    @Column(nullable = false)
     private String notificationstatusName;
 }

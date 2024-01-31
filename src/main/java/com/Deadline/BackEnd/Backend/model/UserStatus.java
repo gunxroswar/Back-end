@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Data
 @Getter
@@ -13,9 +15,10 @@ import lombok.Setter;
 public class UserStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "STATUSID")
     private Long statusID;
-    @Column(name = "STATUSNAME")
+    @Column(nullable = false)
     private String statusName;
+    @OneToMany(mappedBy = "userStatus")
+    private List<User> users;
 
     }

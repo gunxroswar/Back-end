@@ -23,21 +23,21 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public void saveUser(UserDto userDto){
-        User user = new User();
-        user.setName(userDto.getName());
-        // encrypt the password using spring security
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-
-        Role role = roleRepository.findByName("ADMIN");
-        if(role == null){
-            role = checkRoleExist();
-        }
-        user.setRoles(userDto.getRole());
-        userRepository.save(user);
-
-
-    }
+//    public void saveUser(UserDto userDto){
+//        User user = new User();
+//        user.setName(userDto.getName());
+//        // encrypt the password using spring security
+//        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+//
+//        Role role = roleRepository.findByName("ADMIN");
+//        if(role == null){
+//            role = checkRoleExist();
+//        }
+//        user.setRoles(userDto.getRole());
+//        userRepository.save(user);
+//
+//
+//    }
 
 
     public List<UserDto> findAllUsers() {

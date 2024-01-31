@@ -13,8 +13,8 @@ import lombok.Setter;
 public class TagName {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "TAGID")
+
     private Long tagID;
-    @Column(name = "TAGNAME")
+    @Column(nullable = false)
     private String tagName;
 }

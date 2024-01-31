@@ -15,7 +15,6 @@ public class UserDto {
     private Long UID;
     @NotEmpty
     private String name;
-    @NotEmpty(message = "Email should not be empty")
 
     private String password;
 

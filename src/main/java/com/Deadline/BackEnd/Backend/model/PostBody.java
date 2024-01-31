@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -17,28 +18,49 @@ import java.util.Date;
 public class PostBody {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "POSTID")
+
     private Long postid;
 
-    @Column(name = "POSTOWER",nullable = false)
-    private Long uid;
 
-    @Column(name = "TOPIC",nullable = false)
+//    @Column(nullable = false)
+//    private Long postOwerId;
+    @ManyToOne
+    @JoinColumn(name= "owerId")
+    private User user;
+
+    @OneToMany(mappedBy = "post")
+    private List<CommentBody> commentBodies;
+
+    @Column(nullable = false)
     private String topic;
 
-    @Column(name = "DETAIL",nullable = false)
+    @Column(nullable = false)
     private String detail;
-    @Column(name = "LIKE",nullable = false)
+
+    @Column(nullable = false)
     private Long like;
-    @Column(name = "ANONYMOUS",nullable = false)
+
+    @Column(nullable = false)
     private Boolean anonymous;
-    @Column(name = "HASVERIFY",nullable = false)
-    private Boolean hasverify;
-    @Column(name = "POSTSTATUS",nullable = false)
-    private Boolean poststatus;
+
+    @Column(nullable = false)
+    private Boolean hasVerify;
+
+//    @Column(nullable = false)
+//    private Long postStatus;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name= "postStatusId")
+    private  PostStatus postStatus;
+
     @CreationTimestamp
-    private Date dateCreate;
+    @Column(name = "CreateAt",nullable = false,updatable = false)
+    private Date createAt;
+
     @UpdateTimestamp
-    private Date lastUpdate;
+    @Column(name = "UpdateAt")
+    private Date updateAt;
+
+    @ManyToMany(mappedBy = "posts")
+    private List<BookMark> bookMarks;
 
 }

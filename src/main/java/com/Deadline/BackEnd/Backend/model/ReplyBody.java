@@ -20,27 +20,36 @@ public class ReplyBody {
     @Column(name = "REPLYID")
     private Long replyID;
 
-    @Column(name = "COMMENTID")
-    private Long commentID;
-
-    @Column(name = "REPLYOWER",nullable = false)
-    private Long UID;
-    @Column(name = "TOPIC",nullable = false)
+//    @Column(name = "COMMENTID")
+//    private Long commentID;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "commetId")
+    private CommentBody comment ;
+//    @Column(name = "REPLYOWER",nullable = false)
+//    private Long UID;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name= "owerId")
+    private User user;
+    @Column(nullable = false)
     private String topic;
 
-    @Column(name = "DETAIL",nullable = false)
+    @Column(nullable = false)
     private String detail;
-    @Column(name = "LIKE",nullable = false)
-    private Long like;
-    @Column(name = "ANONYMOUS",nullable = false)
-    private Boolean anonymous;
-    @Column(name = "ISVERIFY",nullable = false)
-    private Boolean isVerify;
-    @Column(name = "POSTSTATUS",nullable = false)
-    private Boolean postStatus;
-    @CreationTimestamp
-    private Date dateCreate;
-    @UpdateTimestamp
-    private Date lastUpdate;
+    @Column(nullable = false)
+    private Long like = 0L;
+    @Column(nullable = false)
+    private Boolean anonymous = false;
+    @Column(nullable = false)
+    private Boolean isVerify =  false;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name= "postStatusId")
+    private  PostStatus postStatus;
+
+    @CreationTimestamp
+    @Column(name = "CreateAt",nullable = false,updatable = false)
+    private Date createAt;
+    @UpdateTimestamp
+    @Column(name = "UpdateAt")
+    private Date updateAt;
 }

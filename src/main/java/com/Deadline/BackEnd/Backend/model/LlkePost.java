@@ -13,10 +13,10 @@ import lombok.Setter;
 public class LlkePost {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
+
     private Long id;
-    @Column(name = "POSTID")
+    @Column(nullable = false)
     private Long postID;
-    @Column(name="USERID")
-    private  Long UID;
+    @Column(nullable = false)
+    private  Long uid;
 }
