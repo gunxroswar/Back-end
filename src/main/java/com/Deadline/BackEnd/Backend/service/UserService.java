@@ -1,7 +1,7 @@
 package com.Deadline.BackEnd.Backend.service;
 
 import com.Deadline.BackEnd.Backend.Dto.UserDto;
-import com.Deadline.BackEnd.Backend.exception.model.User;
+import com.Deadline.BackEnd.Backend.model.User;
 
 import java.util.List;
 

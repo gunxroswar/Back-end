@@ -1,4 +1,4 @@
-package com.Deadline.BackEnd.Backend.exception.model;
+package com.Deadline.BackEnd.Backend.model;
 
 import jakarta.persistence.*;
 import lombok.Data;

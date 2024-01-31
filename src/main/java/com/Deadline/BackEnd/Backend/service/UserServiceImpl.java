@@ -1,20 +1,13 @@
 package com.Deadline.BackEnd.Backend.service;
 
 import com.Deadline.BackEnd.Backend.Dto.UserDto;
-import com.Deadline.BackEnd.Backend.exception.model.Role;
-import com.Deadline.BackEnd.Backend.exception.model.User;
+import com.Deadline.BackEnd.Backend.model.Role;
+import com.Deadline.BackEnd.Backend.model.User;
 import com.Deadline.BackEnd.Backend.repository.RoleRepository;
 import com.Deadline.BackEnd.Backend.repository.UserRepository;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.FluentQuery;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class UserServiceImpl implements UserService {

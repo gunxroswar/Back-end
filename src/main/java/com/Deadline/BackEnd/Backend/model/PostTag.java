@@ -1,22 +1,23 @@
-package com.Deadline.BackEnd.Backend.exception.model;
+package com.Deadline.BackEnd.Backend.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+
 @Entity
 @Data
 @Getter
 @Setter
-@Table(name="LIKEPOST")
-public class LlkePost {
+@Table(name="POSTTAG")
+public class PostTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private Long id;
     @Column(name = "POSTID")
     private Long postID;
-    @Column(name="USERID")
-    private  Long UID;
+    @Column(name = "TAGID")
+    private Long tagID;
 }

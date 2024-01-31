@@ -31,6 +31,12 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	implementation 'javax.validation:validation-api:2.0.1.Final' // or the latest version available
+	//JWT
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.4'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.4'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.4'
+
+
 }
 
 tasks.named('test') {

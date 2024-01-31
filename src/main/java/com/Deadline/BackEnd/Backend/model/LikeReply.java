@@ -1,4 +1,4 @@
-package com.Deadline.BackEnd.Backend.exception.model;
+package com.Deadline.BackEnd.Backend.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -9,15 +9,15 @@ import lombok.Setter;
 @Data
 @Getter
 @Setter
-@Table(name="LIKECOMMENT")
+@Table(name="LIKEREPLY")
 
-public class LikeComment {
+public class LikeReply {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private Long id;
-    @Column(name = "COMMENTID")
-    private Long commentID;
+    @Column(name = "REPLYID")
+    private Long REPLYID;
     @Column(name="USERID")
     private  Long UID;
 }
