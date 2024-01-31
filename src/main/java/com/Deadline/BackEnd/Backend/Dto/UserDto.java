@@ -18,4 +18,6 @@ public class UserDto {
     @NotEmpty(message = "Email should not be empty")
 
     private String password;
+
+    private String role;
 }

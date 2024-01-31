@@ -23,7 +23,7 @@ public class User {
     private String name;
 
     @Column(name ="ROLE",nullable = false)
-    private String role ;
+    private String roles ;
 
     @Column(name = "PROFILENAME",nullable = false)
     private String profileName;
