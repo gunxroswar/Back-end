@@ -2,11 +2,10 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.2.2'
 	id 'io.spring.dependency-management' version '1.1.4'
-	id 'io.github.cdimascio.dotenv' version '5.2.2'
+
 }
 
-apply plugin: 'java'
-aplly plugin: 'io.spring.dependency-management'
+
 
 group = 'com.Deadline.Back-End'
 version = '0.0.1-SNAPSHOT'

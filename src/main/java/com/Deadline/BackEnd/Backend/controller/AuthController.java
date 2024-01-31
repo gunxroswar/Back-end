@@ -25,24 +25,24 @@ public class AuthController {
         return "register";
     }
 
-    public String registration(@Valid @ModelAttribute("user") UserDto userDto, BindingResult result, Model model){
-
-        User existingUser = UserService.findUserByUsername(userDto.getUsername()) ;
-
-        //ถ้าอีเมลถูกใช้สมัครแล้ว reject
-        if(existingUser != null && existingUser.getUsername() != null && !existingUser.getUsername().isEmpty()){
-            result.rejectValue("username", null,
-                    "There is already an account registered with the same username");
-        }
-
-        if(result.hasErrors()){
-            model.addAttribute("user", userDto);
-            return "/register";
-        }
-
-        UserService.saveUser(userDto);
-        return "redirect:/register?success";
-    }
+//    public String registration(@Valid @ModelAttribute("user") UserDto userDto, BindingResult result, Model model){
+//
+//        User existingUser = UserService.findUserByUsername(userDto.getUsername()) ;
+//
+//        //ถ้าอีเมลถูกใช้สมัครแล้ว reject
+//        if(existingUser != null && existingUser.getUsername() != null && !existingUser.getUsername().isEmpty()){
+//            result.rejectValue("username", null,
+//                    "There is already an account registered with the same username");
+//        }
+//
+//        if(result.hasErrors()){
+//            model.addAttribute("user", userDto);
+//            return "/register";
+//        }
+//
+//        UserService.saveUser(userDto);
+//        return "redirect:/register?success";
+//    }
 
     // handler method to handle list of users
     @GetMapping("/users")

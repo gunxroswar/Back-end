@@ -20,18 +20,18 @@ public class CustomUserDetailsService {
     }
 
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-
-        if (user != null) {
-            return new org.springframework.security.core.userdetails.User(user.getUsername(),
-                    user.getPassword(),
-                    mapRolesToAuthorities(user.getRoles()));
-        }else{
-            throw new UsernameNotFoundException("Invalid username or password.");
-        }
-    }
+//    @Override
+//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//        User user = userRepository.findByUsername(username);
+//
+//        if (user != null) {
+//            return new org.springframework.security.core.userdetails.User(user.getUsername(),
+//                    user.getPassword(),
+//                    mapRolesToAuthorities(user.getRoles()));
+//        }else{
+//            throw new UsernameNotFoundException("Invalid username or password.");
+//        }
+//    }
 
     private Collection< ? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles) {
         Collection < ? extends GrantedAuthority> mapRoles = roles.stream()
