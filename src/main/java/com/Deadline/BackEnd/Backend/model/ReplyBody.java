@@ -1,4 +1,4 @@
-package com.Deadline.BackEnd.Backend;
+package com.Deadline.BackEnd.Backend.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -13,16 +13,18 @@ import java.util.Date;
 @Data
 @Getter
 @Setter
-@Table(name="POST")
-public class PostBody {
+@Table(name="REPLY")
+public class ReplyBody {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "POSTID")
-    private Long postid;
+    @Column(name = "REPLYID")
+    private Long replyID;
 
-    @Column(name = "POSTOWER",nullable = false)
-    private Long uid;
+    @Column(name = "COMMENTID")
+    private Long commentID;
 
+    @Column(name = "REPLYOWER",nullable = false)
+    private Long UID;
     @Column(name = "TOPIC",nullable = false)
     private String topic;
 
@@ -32,10 +34,10 @@ public class PostBody {
     private Long like;
     @Column(name = "ANONYMOUS",nullable = false)
     private Boolean anonymous;
-    @Column(name = "HASVERIFY",nullable = false)
-    private Boolean hasverify;
+    @Column(name = "ISVERIFY",nullable = false)
+    private Boolean isVerify;
     @Column(name = "POSTSTATUS",nullable = false)
-    private Boolean poststatus;
+    private Boolean postStatus;
     @CreationTimestamp
     private Date dateCreate;
     @UpdateTimestamp

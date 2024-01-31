@@ -1,4 +1,4 @@
-package com.Deadline.BackEnd.Backend;
+package com.Deadline.BackEnd.Backend.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -13,17 +13,17 @@ import java.util.Date;
 @Data
 @Getter
 @Setter
-@Table(name="REPLY")
-public class ReplyBody {
+@Table(name="COMMENT")
+public class CommentBody {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "REPLYID")
-    private Long replyID;
-
     @Column(name = "COMMENTID")
     private Long commentID;
 
-    @Column(name = "REPLYOWER",nullable = false)
+    @Column(name = "POSTID")
+    private Long postID;
+
+    @Column(name = "COMMENTOWER",nullable = false)
     private Long UID;
     @Column(name = "TOPIC",nullable = false)
     private String topic;
