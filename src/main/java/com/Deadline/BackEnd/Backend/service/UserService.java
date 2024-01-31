@@ -10,7 +10,8 @@ public interface UserService {
     static void saveUser(UserDto userDto) {
     }
 
-    static User findUserByEmail(String email) {return null;
+    static User findUserByUsername(String Username) {
+        return null;
     }
 
     static List<UserDto> findAllUsers(){

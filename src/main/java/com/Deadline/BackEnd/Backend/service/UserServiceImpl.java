@@ -23,9 +23,10 @@ public class UserServiceImpl implements UserService {
     }
 
 
+
 //    public void saveUser(UserDto userDto){
 //        User user = new User();
-//        user.setName(userDto.getName());
+//        user.setUsername(userDto.getUsername());
 //        // encrypt the password using spring security
 //        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 //
@@ -33,27 +34,27 @@ public class UserServiceImpl implements UserService {
 //        if(role == null){
 //            role = checkRoleExist();
 //        }
-//        user.setRoles(userDto.getRole());
+//        user.setRoles(List.of(role));
 //        userRepository.save(user);
-//
 //
 //    }
 
 
-    public List<UserDto> findAllUsers() {
-        List<User> users = userRepository.findAll();
-        return users.stream()
-                .map(this::mapToUserDto)
-                .collect(Collectors.toList());
-    }
 
-    private UserDto mapToUserDto(User user){
-        UserDto userDto = new UserDto();
-        String str = user.getName();
-        userDto.setName(str);
+//    public List<UserDto> findAllUsers() {
+//        List<User> users = userRepository.findAll();
+//        return users.stream()
+//                .map((user) -> mapToUserDto(user))
+//                .collect(Collectors.toList());
+//    }
 
-        return userDto;
-    }
+//    private UserDto mapToUserDto(User user){
+//        UserDto userDto = new UserDto();
+//        String str = user.getUsername();
+//        userDto.setUsername(str);
+//
+//        return userDto;
+//    }
 
     private Role checkRoleExist(){
         Role role = new Role();
