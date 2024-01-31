@@ -1,4 +1,4 @@
-package com.Deadline.BackEnd.Backend.model;
+package com.Deadline.BackEnd.Backend.exception.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -15,17 +15,25 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "UID")
     private Long UID;
+
     @Column(name = "IMAGEDIR")
     private String imageDir;
-    @Column(name = "NAME",nullable = false)
 
+    @Column(name = "NAME",nullable = false)
     private String name;
+
     @Column(name ="ROLE",nullable = false)
     private String role ;
+
     @Column(name = "PROFILENAME",nullable = false)
     private String profileName;
+
     @Column(name = "USERNAME",nullable = false)
     private String username;
+
+    @Column(name ="PASSWORD", nullable = false)
+    private String password;
+
     @Column(name = "StatusID",nullable = false)
     private String status;
 
