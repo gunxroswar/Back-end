@@ -1,41 +1,41 @@
 package com.Deadline.BackEnd.Backend.model;
 
+
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Data
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name="USER")
-public class User {
+public class User  {
+    private static  final long serialVersionID = 1L;
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "UID")
-    private Long UID;
-
-    @Column(name = "IMAGEDIR")
-    private String imageDir;
-
-    @Column(name = "NAME",nullable = false)
-    private String name;
-
-    @Column(name ="ROLE",nullable = false)
-    private String roles ;
-
-    @Column(name = "PROFILENAME",nullable = false)
-    private String profileName;
-
-    @Column(name = "USERNAME",nullable = false)
+    @GeneratedValue
     private String username;
 
-    @Column(name ="PASSWORD", nullable = false)
+    @Column(nullable = false)
     private String password;
 
-    @Column(name = "StatusID",nullable = false)
-    private String status;
+    @ManyToMany
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = {@JoinColumn(name = "USER_ID", referencedColumnName = "ID")},
+            inverseJoinColumns = {@JoinColumn(name = "ROLE_ID", referencedColumnName = "ID")}
+    )
+    private List<Role> roles = new ArrayList<>();
+
 
 }
 

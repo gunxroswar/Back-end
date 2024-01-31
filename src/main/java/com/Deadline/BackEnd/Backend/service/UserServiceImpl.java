@@ -20,12 +20,12 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
-    }
 
+    }
 
     public void saveUser(UserDto userDto){
         User user = new User();
-        user.setName(userDto.getName());
+        user.setUsername(userDto.getUsername());
         // encrypt the password using spring security
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
@@ -33,24 +33,24 @@ public class UserServiceImpl implements UserService {
         if(role == null){
             role = checkRoleExist();
         }
-        user.setRoles(userDto.getRole());
+        user.setRoles(List.of(role));
         userRepository.save(user);
 
-
     }
+
 
 
     public List<UserDto> findAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(this::mapToUserDto)
+                .map((user) -> mapToUserDto(user))
                 .collect(Collectors.toList());
     }
 
     private UserDto mapToUserDto(User user){
         UserDto userDto = new UserDto();
-        String str = user.getName();
-        userDto.setName(str);
+        String str = user.getUsername();
+        userDto.setUsername(str);
 
         return userDto;
     }

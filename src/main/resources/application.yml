@@ -1,0 +1,5 @@
+#  /*resources/application.yml*/
+  security:
+    jwt:
+      token:
+        secret-key: ${JWT_SECRET}
