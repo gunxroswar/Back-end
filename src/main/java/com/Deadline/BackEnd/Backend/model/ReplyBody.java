@@ -35,8 +35,8 @@ public class ReplyBody {
 
     @Column(nullable = false)
     private String detail;
-    @Column(nullable = false)
-    private Long like = 0L;
+//    @Column(nullable = false)
+//    private Long like ;
     @Column(nullable = false)
     private Boolean anonymous = false;
     @Column(nullable = false)

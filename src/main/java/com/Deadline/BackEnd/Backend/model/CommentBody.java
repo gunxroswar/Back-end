@@ -47,8 +47,8 @@ public class CommentBody {
     @Column(nullable = false)
     private String detail;
 
-    @Column(nullable = false)
-    private Long like;
+//    @Column(nullable = false)
+//    private Long like;
 
     @Column(nullable = false)
     private Boolean anonymous;
