@@ -15,7 +15,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "UID")
     private Long UID;
+    @Column(name = "IMAGEDIR")
+    private String imageDir;
     @Column(name = "NAME",nullable = false)
+
     private String name;
     @Column(name ="ROLE",nullable = false)
     private String role ;
