@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+import java.util.Map;
+
 @Entity
 @Data
 @Getter
@@ -17,4 +20,7 @@ public class NotificationStatus {
     private Long notificationstatusID;
     @Column(nullable = false)
     private String notificationstatusName;
+
+    @OneToMany(mappedBy = "notificationStatus")
+    private List<Notification> notifications;
 }

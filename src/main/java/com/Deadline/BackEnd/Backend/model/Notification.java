@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Data
 @Getter
@@ -18,9 +20,10 @@ public class Notification {
     @Column(nullable = false)
     private String detail;
 
-    @Column(nullable = false)
-    private Long statusID;
 
     @Column(nullable = false)
     private  String reference;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name ="statusId")
+    private NotificationStatus notificationStatus;
 }

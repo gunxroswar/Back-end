@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -30,13 +31,14 @@ public class ReplyBody {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name= "owerId")
     private User user;
-    @Column(nullable = false)
+
+    @Column(nullable = false,length = 512)
     private String topic;
 
-    @Column(nullable = false)
+    @Column(nullable = false,length = 4096)
     private String detail;
-//    @Column(nullable = false)
-//    private Long like ;
+    @Column(nullable = false)
+    private Long likeCount ;
     @Column(nullable = false)
     private Boolean anonymous = false;
     @Column(nullable = false)
@@ -44,7 +46,7 @@ public class ReplyBody {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name= "postStatusId")
-    private  PostStatus postStatus;
+    private  PostStatus statusOfReply;
 
     @CreationTimestamp
     @Column(name = "CreateAt",nullable = false,updatable = false)
@@ -52,4 +54,11 @@ public class ReplyBody {
     @UpdateTimestamp
     @Column(name = "UpdateAt")
     private Date updateAt;
+    @ManyToMany
+    @JoinTable(
+            name = "like_reply",
+            joinColumns = @JoinColumn(name = "replyId"),
+            inverseJoinColumns = @JoinColumn(name = "userId")
+    )
+    private List<User> userLikeReply;
 }

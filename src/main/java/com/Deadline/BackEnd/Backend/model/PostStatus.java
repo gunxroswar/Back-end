@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Data
 @Getter
@@ -17,5 +19,11 @@ public class PostStatus {
     private Long postStatusID;
     @Column(nullable = false)
     private String postStatusName;
+    @OneToMany(mappedBy = "statusOfPost")
+    private List<PostBody> postBodies;
+    @OneToMany(mappedBy = "statusOfComment")
+    private List<CommentBody> commentBodies;
+    @OneToMany(mappedBy = "statusOfReply")
+    private List<ReplyBody> replyBodies ;
 
 }

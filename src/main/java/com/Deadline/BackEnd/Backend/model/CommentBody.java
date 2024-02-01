@@ -41,14 +41,14 @@ public class CommentBody {
     private List<ReplyBody> replyBodies;
 
 
-    @Column(nullable = false)
+    @Column(nullable = false,length = 512)
     private String topic;
 
-    @Column(nullable = false)
+    @Column(nullable = false,length = 4096)
     private String detail;
 
-//    @Column(nullable = false)
-//    private Long like;
+    @Column(nullable = false)
+    private Long likeCount;
 
     @Column(nullable = false)
     private Boolean anonymous;
@@ -58,7 +58,7 @@ public class CommentBody {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name= "postStatusId")
-    private  PostStatus postStatus;
+    private  PostStatus statusOfComment;
 
     @CreationTimestamp
     @Column(name = "CreateAt",nullable = false,updatable = false)
@@ -66,5 +66,12 @@ public class CommentBody {
     @UpdateTimestamp
     @Column(name = "UpdateAt")
     private Date updateAt;
+    @ManyToMany
+    @JoinTable(
+            name = "like_comment",
+            joinColumns = @JoinColumn(name = "commentId"),
+            inverseJoinColumns = @JoinColumn(name = "userId")
+    )
+    private List<User> userLikeComment;
 
 }

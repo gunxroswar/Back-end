@@ -52,11 +52,19 @@ public class User {
 
 
     @OneToMany(mappedBy = "user")
-    private List<PostBody> postBodies;
+    private List<PostBody> posts;
 
 //    @OneToOne
 //    @JoinColumn(name="bookmarkId")
 //    private BookMark bookmark;
+
+    @ManyToMany
+    @JoinTable(
+            name = "bookmark",
+            joinColumns = @JoinColumn(name = "userId"),
+            inverseJoinColumns = @JoinColumn(name = "postId")
+    )
+    private List<PostBody> bookmarkPosts;
 
 
 

@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Data
 @Getter
@@ -17,4 +19,12 @@ public class TagName {
     private Long tagID;
     @Column(nullable = false)
     private String tagName;
+    @ManyToMany
+    @JoinTable(
+            name = "tag_post",
+            joinColumns = @JoinColumn(name = "tagId"),
+            inverseJoinColumns = @JoinColumn(name = "postId")
+    )
+    private List<PostBody> postWithTags;
 }
+

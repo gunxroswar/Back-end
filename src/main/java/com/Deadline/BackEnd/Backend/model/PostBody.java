@@ -22,8 +22,7 @@ public class PostBody {
     private Long postid;
 
 
-//    @Column(nullable = false)
-//    private Long postOwerId;
+
     @ManyToOne
     @JoinColumn(name= "owerId")
     private User user;
@@ -31,14 +30,14 @@ public class PostBody {
     @OneToMany(mappedBy = "post")
     private List<CommentBody> commentBodies;
 
-    @Column(nullable = false)
+    @Column(nullable = false,length = 512)
     private String topic;
 
-    @Column(nullable = false)
+    @Column(nullable = false,length = 4096)
     private String detail;
 
-//    @Column(nullable = false)
-//    private Long like;
+    @Column(nullable = false)
+    private Long likeCount;
 
     @Column(nullable = false)
     private Boolean anonymous;
@@ -46,11 +45,10 @@ public class PostBody {
     @Column(nullable = false)
     private Boolean hasVerify;
 
-//    @Column(nullable = false)
-//    private Long postStatus;
+
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name= "postStatusId")
-    private  PostStatus postStatus;
+    @JoinColumn(name= "StatusId")
+    private  PostStatus statusOfPost;
 
     @CreationTimestamp
     @Column(name = "CreateAt",nullable = false,updatable = false)
@@ -60,7 +58,19 @@ public class PostBody {
     @Column(name = "UpdateAt")
     private Date updateAt;
 
-    @ManyToMany(mappedBy = "posts")
-    private List<BookMark> bookMarks;
+    @ManyToMany(mappedBy = "bookmarkPosts")
+    private List<User> userBookmarks;
+
+    @ManyToMany(mappedBy = "postWithTags")
+    private List<TagName> tagNames;
+
+    @ManyToMany
+    @JoinTable(
+            name = "like_post",
+            joinColumns = @JoinColumn(name = "postId"),
+            inverseJoinColumns = @JoinColumn(name = "userId")
+    )
+    private List<User> userLikePost;
+
 
 }
