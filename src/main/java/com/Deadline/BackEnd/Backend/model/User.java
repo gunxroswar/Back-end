@@ -45,7 +45,7 @@ public class User {
     private String password;
 
 //    @Column(nullable = false)
-//    private String status;
+
     @ManyToOne
     @JoinColumn(name ="statusId")
     private UserStatus userStatus;
@@ -54,9 +54,7 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<PostBody> posts;
 
-//    @OneToOne
-//    @JoinColumn(name="bookmarkId")
-//    private BookMark bookmark;
+
 
     @ManyToMany
     @JoinTable(

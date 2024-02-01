@@ -24,15 +24,13 @@ public class CommentBody {
     private Long commentID;
 
 //    @NotNull(message = "postID should not be null")
-//    @Column(nullable = false)
-//    private Long postID;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "postId")
     private PostBody post;
 
 //    @NotNull(message = "commentOwerID should not be null")
-//    @Column(nullable = false)
-//    private Long commentOwerID;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name= "owerId")
     private User user;

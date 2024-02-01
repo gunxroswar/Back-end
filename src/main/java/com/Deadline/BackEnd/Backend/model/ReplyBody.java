@@ -22,12 +22,12 @@ public class ReplyBody {
     private Long replyID;
 
 //    @Column(name = "COMMENTID")
-//    private Long commentID;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "commetId")
     private CommentBody comment ;
 //    @Column(name = "REPLYOWER",nullable = false)
-//    private Long UID;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name= "owerId")
     private User user;
