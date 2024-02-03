@@ -6,9 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import java.util.List;
 
@@ -52,7 +50,7 @@ public class User {
 
 
     @OneToMany(mappedBy = "user")
-    private List<PostBody> posts;
+    private Set<PostBody> posts;
 
 
 
@@ -62,7 +60,7 @@ public class User {
             joinColumns = @JoinColumn(name = "userId"),
             inverseJoinColumns = @JoinColumn(name = "postId")
     )
-    private List<PostBody> bookmarkPosts;
+    private Set<PostBody> bookmarkPosts;
 
 
 

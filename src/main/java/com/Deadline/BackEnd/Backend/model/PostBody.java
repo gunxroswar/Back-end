@@ -9,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -20,8 +21,6 @@ public class PostBody {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     private Long postid;
-
-
 
     @ManyToOne
     @JoinColumn(name= "owerId")
@@ -59,10 +58,10 @@ public class PostBody {
     private Date updateAt;
 
     @ManyToMany(mappedBy = "bookmarkPosts")
-    private List<User> userBookmarks;
+    private Set<User> userBookmarks;
 
     @ManyToMany(mappedBy = "postWithTags")
-    private List<TagName> tagNames;
+    private Set<TagName> tagNames;
 
     @ManyToMany
     @JoinTable(
@@ -70,7 +69,7 @@ public class PostBody {
             joinColumns = @JoinColumn(name = "postId"),
             inverseJoinColumns = @JoinColumn(name = "userId")
     )
-    private List<User> userLikePost;
+    private Set<User> userLikePost;
 
 
 }

@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -23,14 +24,13 @@ public class CommentBody {
 
     private Long commentID;
 
-//    @NotNull(message = "postID should not be null")
 
+    @NotNull(message = "postID should not be null")
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "postId")
     private PostBody post;
 
-//    @NotNull(message = "commentOwerID should not be null")
-
+    @NotNull(message = "commentOwerID should not be null")
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name= "owerId")
     private User user;
@@ -70,6 +70,6 @@ public class CommentBody {
             joinColumns = @JoinColumn(name = "commentId"),
             inverseJoinColumns = @JoinColumn(name = "userId")
     )
-    private List<User> userLikeComment;
+    private Set<User> userLikeComment;
 
 }

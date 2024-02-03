@@ -9,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -60,5 +61,5 @@ public class ReplyBody {
             joinColumns = @JoinColumn(name = "replyId"),
             inverseJoinColumns = @JoinColumn(name = "userId")
     )
-    private List<User> userLikeReply;
+    private Set<User> userLikeReply;
 }

@@ -23,4 +23,6 @@ public class NotificationStatus {
 
     @OneToMany(mappedBy = "notificationStatus")
     private List<Notification> notifications;
+
+
 }
