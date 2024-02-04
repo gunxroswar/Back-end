@@ -1,9 +1,10 @@
 package com.Deadline.BackEnd.Backend.controller;
 import com.Deadline.BackEnd.Backend.Objects.createPost;
 import com.Deadline.BackEnd.Backend.Objects.login;
-import com.Deadline.BackEnd.Backend.Objects.signup;
+import com.Deadline.BackEnd.Backend.Objects.signin;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -32,13 +33,15 @@ public class APIcontroller {
             singleData.deleteCharAt(singleData.length()-1);
             singleData.append("}");
             returnData.append(singleData + ",");
-            singleData.delete(0, singleData.length()-1);
+            singleData.delete(0, singleData.length());
         }
 
         returnData.deleteCharAt(returnData.length()-1);
         if(rowCount == 1){
             returnData.deleteCharAt(0);
             return returnData.toString();
+        } else if (rowCount == 0) {
+            return "[]";
         }
         returnData.append("]");
 
@@ -66,11 +69,11 @@ public class APIcontroller {
         String displayName = null;
         try{
             ResultSet rs = stmt.executeQuery(QUERY);
-            while(rs.next()){
-                existUser = rs.getString("username");
-                existPassword = rs.getString("password");
-                displayName = rs.getString("displayName");
-            }
+            rs.next();
+            existUser = rs.getString("username");
+            existPassword = rs.getString("password");
+            displayName = rs.getString("displayName");
+
             if(existUser == null) return "400";
             else if(!Objects.equals(existPassword, info.password)) return "400";
         }
@@ -84,8 +87,7 @@ public class APIcontroller {
 
     @PostMapping("/guests/signin")
     @CrossOrigin(origins = "http://localhost:3000")
-    public String signin(@RequestBody signup info){
-        //String QUERY = "SELECT username, password FROM User;";
+    public String signin(@RequestBody signin info){
         String QUERY = "INSERT INTO User VALUES ('".concat(info.userName + "', '" + info.password + "', '" + info.displayName + "');");
         try{
             stmt.executeUpdate(QUERY);
@@ -100,30 +102,26 @@ public class APIcontroller {
     @PostMapping("/posts/create")
     @CrossOrigin(origins = "http://localhost:3000")
     public String createPost(@RequestBody createPost cp){
-        int maxPostID = 0;
-        int postOwner = 0;
+        BigInteger postid;
+        int anonymous = 1;
+        String create_at = String.valueOf(new Timestamp(System.currentTimeMillis()));
+        int has_verify = 0;
         String topic = cp.Payload.topic;
-        String timeStamp = String.valueOf(new Timestamp(System.currentTimeMillis()));
         String detail = cp.Payload.detail;
-        int likeCount = 0;
-        int annoymous = 0;
-        int hasVerify = 0;
-        int postStatus = 0;
+        String update_at = create_at;
+        BigInteger post_status_id = BigInteger.valueOf(1);
+        BigInteger owner_id = BigInteger.valueOf(1);
+        BigInteger like_count = BigInteger.valueOf(1);
+        BigInteger status_id = BigInteger.valueOf(1);
 
-        String MAXIndexQUERY = "SELECT MAX(PostID) FROM Posts;";
-        try{
-            ResultSet rs = stmt.executeQuery(MAXIndexQUERY);
-            while(rs.next()){
-                maxPostID = rs.getInt("MAX(PostID)")+1;
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return "200";
-        }
 
-        String QUERY = "INSERT INTO Posts VALUES (".concat(maxPostID + ", " + postOwner + ", '" + topic + "', '" + timeStamp + "', '" + detail + "', " + likeCount + ", " + annoymous + ", " + hasVerify + ", " + postStatus + ");");
+        String QUERY = "SELECT MAX(PostID) FROM post;";
         try{
+            ResultSet rs = stmt.executeQuery(QUERY);
+            rs.next();
+            postid = BigInteger.valueOf(rs.getLong("MAX(PostID)"));
+            postid = postid.add(BigInteger.valueOf(1));
+            QUERY = "INSERT INTO post VALUES (" + postid + ", " + anonymous + ", '" + create_at + "', '" + detail + "', " + has_verify + ", '" + topic + "', '" + update_at + "', " + post_status_id + ", " + owner_id + ", " + like_count + ", "  + status_id + ");";
             stmt.executeUpdate(QUERY);
         }
         catch (Exception e) {
@@ -138,31 +136,16 @@ public class APIcontroller {
     @GetMapping("/posts")
     @CrossOrigin(origins = "http://localhost:3000")
     public String getPost(@RequestParam("postId") int id){
+        String sendBack;
         String QUERY = "SELECT Topic, Detail , TimeStamp, LikeCount FROM Posts WHERE postId = ".concat(id + ";");
-        String topic = "";
-        String detail = "";
-        String timeStamp = "";
-        String likeCount = "";
         try{
             ResultSet rs = stmt.executeQuery(QUERY);
-            while(rs.next()){
-                topic = rs.getString("Topic");
-                detail = rs.getString("Detail");
-                timeStamp = rs.getString("TimeStamp");
-                likeCount = rs.getString("LikeCount");
-            }
+            sendBack = autoPayloadBuilder(rs);
         }
         catch (Exception e) {
             e.printStackTrace();
             return "200";
         }
-
-        String sendBack = "{" +
-                "\"Topic\": \"" + topic + "\"," +
-                "\"Detail\": \"" + detail + "\"," +
-                "\"TimeStamp\": \"" + timeStamp + "\"," +
-                "\"LikeCount\": \"" + likeCount + "\"" +
-                "}";
 
         return sendBack;
     }
@@ -170,50 +153,82 @@ public class APIcontroller {
     @GetMapping("/pages")
     @CrossOrigin(origins = "http://localhost:3000")
     public String getPage(@RequestParam("page") int id){
-        String QUERY = "SELECT PostID, PostOwner, Topic, Detail , TimeStamp, LikeCount, hasVerify FROM Posts ORDER BY TimeStamp DESC LIMIT 10;";
-        String postID = "";
-        String postOwner = "";
-        String topic = "";
-        String detail = "";
-        String timeStamp = "";
-        String likeCount = "";
-        String hasVerify = "";
-        String crafter = "";
-        StringBuilder sendBack = new StringBuilder("[");
+        String sendBack;
+        String QUERY = "SELECT PostID, user.username , Topic, Detail , TimeStamp, LikeCount, hasVerify \n" +
+                "FROM Posts \n" +
+                "INNER JOIN user ON PostOwner = user.uid\n" +
+                "ORDER BY TimeStamp DESC LIMIT 10;";
         try{
             ResultSet rs = stmt.executeQuery(QUERY);
-            while(rs.next()){
-                postID = rs.getString("PostID");
-                postOwner = rs.getString("PostOwner");
-                topic = rs.getString("Topic");
-                detail = rs.getString("Detail");
-                timeStamp = rs.getString("TimeStamp");
-                likeCount = rs.getString("LikeCount");
-                hasVerify = rs.getString("hasVerify");
-
-                crafter = "{" +
-                        "\"postID\": \"" + postID + "\"," +
-                        "\"postOwner\": \"" + postOwner + "\"," +
-                        "\"Topic\": \"" + topic + "\"," +
-                        "\"Detail\": \"" + detail + "\"," +
-                        "\"TimeStamp\": \"" + timeStamp + "\"," +
-                        "\"LikeCount\": \"" + likeCount + "\"," +
-                        "\"taglist\": \"" + "[]" + "\"," +
-                        "\"hasVerify\": \"" + hasVerify + "\"" +
-                        "}";
-
-                sendBack.append(crafter).append(",");
-            }
+            sendBack = autoPayloadBuilder(rs);
         }
         catch (Exception e) {
             e.printStackTrace();
             return "200";
         }
 
-        sendBack.deleteCharAt(sendBack.length() - 1);
-        sendBack.append("]");
+        return sendBack;
+    }
 
-        return sendBack.toString();
+    @GetMapping("/comments")
+    @CrossOrigin(origins = "http://localhost:3000")
+    public String getComment(@RequestParam("commentId") int post_id){
+        String sendBack;
+        String QUERY =
+                "SELECT commentid as 'CommentID', user.name as 'displayName', like_count as 'LikeAmount', is_verify as 'hasVerify', 0 as 'replyAmount', create_at as 'CreateDate', detail\n" +
+                "FROM comment\n" +
+                "INNER JOIN user ON user.uid = comment.ower_id\n" +
+                "WHERE comment.post_id = " + post_id + ";";
+
+        try{
+            ResultSet rs = stmt.executeQuery(QUERY);
+            sendBack = autoPayloadBuilder(rs);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return "200";
+        }
+
+        return sendBack;
+    }
+
+    @PostMapping("/comments/create")
+    @CrossOrigin(origins = "http://localhost:3000")
+    public String createComment(@RequestBody createComment info){
+        BigInteger commentid;
+        int anonymous = 1;
+        String create_at = String.valueOf(new Timestamp(System.currentTimeMillis()));
+        String detail = info.Payload.detail;
+        int is_verify = 0;
+        String topic;
+        String update_at = create_at;
+        BigInteger post_id = info.Payload.PostID;
+        BigInteger post_status_id = BigInteger.valueOf(1);
+        BigInteger owner_id = BigInteger.valueOf(1);
+        BigInteger like_count = BigInteger.valueOf(1);
+        String QUERY;
+        try{
+            QUERY = "SELECT MAX(commentid) FROM comment;";
+            ResultSet rs = stmt.executeQuery(QUERY);
+            rs.next();
+            commentid = BigInteger.valueOf(rs.getLong("MAX(commentid)"));
+            commentid = commentid.add(BigInteger.valueOf(1));
+
+            QUERY = "SELECT Topic FROM Posts WHERE Posts.PostID = " + info.Payload.PostID + ";";
+            rs = stmt.executeQuery(QUERY);
+            rs.next();
+            topic = rs.getString("Topic");
+
+            QUERY = "INSERT INTO comment VALUES (" + commentid + ", " + anonymous + ", '" + create_at + "', '" + detail + "', " + is_verify + ", '" + topic + "', '" + update_at + "', " + post_id + ", " + post_status_id + ", " + owner_id + ", " + like_count + ");";
+            stmt.executeUpdate(QUERY);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return "200";
+        }
+
+
+       return "201";
     }
 
     /*
