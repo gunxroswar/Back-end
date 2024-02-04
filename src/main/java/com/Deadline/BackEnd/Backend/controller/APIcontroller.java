@@ -1,7 +1,7 @@
 package com.Deadline.BackEnd.Backend.controller;
 import com.Deadline.BackEnd.Backend.Objects.createPost;
 import com.Deadline.BackEnd.Backend.Objects.login;
-import com.Deadline.BackEnd.Backend.Objects.signin;
+import com.Deadline.BackEnd.Backend.Objects.signup;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.*;
@@ -10,9 +10,9 @@ import java.util.Objects;
 @RestController
 public class APIcontroller {
 
-    static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/albaz";
-    static final String USER = "gunxroswar";
-    static final String PASS = "Gxz171477940*";
+    static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/backend_database";
+    static final String USER = "root";
+    static final String PASS = "boegy5882";
     Connection conn = null;
     Statement stmt = null;
 
@@ -52,9 +52,9 @@ public class APIcontroller {
         return "{\"status\": 200, \"displayName\": \"" + displayName + "\"}";
     }
 
-    @PostMapping("/guests/signin")
+    @PostMapping("/guests/signup1")
     @CrossOrigin(origins = "http://localhost:3000")
-    public String signin(@RequestBody signin info){
+    public String signup(@RequestBody signup info){
         //String QUERY = "SELECT username, password FROM User;";
         String QUERY = "INSERT INTO User VALUES ('".concat(info.userName + "', '" + info.password + "', '" + info.displayName + "');");
         try{

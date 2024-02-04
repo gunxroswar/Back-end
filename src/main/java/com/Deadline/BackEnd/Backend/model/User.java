@@ -1,6 +1,8 @@
 package com.Deadline.BackEnd.Backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.*;
@@ -20,22 +22,25 @@ public class User {
     @Column(name = "UID")
     private Long uid;
 
-    @Column(nullable = true)
-    private String imageDir;
 
-    @Column(nullable = false)
-    private String name;
+    private String imageDir = "image.png";
 
     @ManyToOne
     @JoinColumn(name = "roleId")
     private Role role ;
 
-    @Column(nullable = false)
+    @NotBlank(message= "ProfileName must not be blank")
+    @Size(min = 2 ,message = "ProfileName must be more than 2 character")
+    @Column(nullable = false,unique = true)
     private String profileName;
 
-    @Column(nullable = false)
+    @NotBlank(message= "Username must not be blank")
+    @Size(min = 2 ,message = "Username must be more than 2 character")
+    @Column(nullable = false,unique = true)
     private String username;
 
+    @NotBlank(message= "Password must not be blank")
+    @Size(min = 8 ,message = "Password must be more than 8 character")
     @Column(nullable = false)
     private String password;
 

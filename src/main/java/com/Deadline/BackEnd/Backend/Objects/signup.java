@@ -1,6 +1,6 @@
 package com.Deadline.BackEnd.Backend.Objects;
 
-public class signin extends login{
+public class signup extends login{
     public String displayName;
 }
 
