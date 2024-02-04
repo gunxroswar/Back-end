@@ -7,8 +7,6 @@ import lombok.*;
 
 import java.util.*;
 
-import java.util.List;
-
 @Entity
 @Data
 @Getter
@@ -52,7 +50,7 @@ public class User {
 
 
     @OneToMany(mappedBy = "user")
-    private Set<PostBody> posts;
+    private Set<Post> posts;
 
 
 
@@ -62,7 +60,7 @@ public class User {
             joinColumns = @JoinColumn(name = "userId"),
             inverseJoinColumns = @JoinColumn(name = "postId")
     )
-    private Set<PostBody> bookmarkPosts;
+    private Set<Post> bookmarkPosts;
 
 
 
