@@ -5,16 +5,46 @@ import com.Deadline.BackEnd.Backend.Objects.signup;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Objects;
 
 @RestController
 public class APIcontroller {
 
-    static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/backend_database";
+    static final String DB_URL = "jdbc:mysql://localhost:3306/backend_database";
     static final String USER = "root";
-    static final String PASS = "boegy5882";
+    static final String PASS = "Kw050x\\>RaoM/WJO";
     Connection conn = null;
     Statement stmt = null;
+
+    public String autoPayloadBuilder(ResultSet rs) throws SQLException {
+        ResultSetMetaData metaData = rs.getMetaData();
+        StringBuilder singleData = new StringBuilder();
+        StringBuilder returnData = new StringBuilder();
+        returnData.append("[");
+        int rowCount = 0;
+        while(rs.next()){
+            rowCount++;
+            singleData.append("{");
+            for(int i = 1 ; i <= metaData.getColumnCount(); i++){
+                singleData.append("\"" + metaData.getColumnName(i) + "\": \"" + rs.getString(i) + "\",");
+            }
+            singleData.deleteCharAt(singleData.length()-1);
+            singleData.append("}");
+            returnData.append(singleData + ",");
+            singleData.delete(0, singleData.length()-1);
+        }
+
+        returnData.deleteCharAt(returnData.length()-1);
+        if(rowCount == 1){
+            returnData.deleteCharAt(0);
+            return returnData.toString();
+        }
+        returnData.append("]");
+
+
+        return returnData.toString();
+    }
 
     public APIcontroller() throws SQLException {
         conn = DriverManager.getConnection(DB_URL, USER, PASS);
@@ -52,9 +82,9 @@ public class APIcontroller {
         return "{\"status\": 200, \"displayName\": \"" + displayName + "\"}";
     }
 
-    @PostMapping("/guests/signup1")
+    @PostMapping("/guests/signin")
     @CrossOrigin(origins = "http://localhost:3000")
-    public String signup(@RequestBody signup info){
+    public String signin(@RequestBody signin info){
         //String QUERY = "SELECT username, password FROM User;";
         String QUERY = "INSERT INTO User VALUES ('".concat(info.userName + "', '" + info.password + "', '" + info.displayName + "');");
         try{
