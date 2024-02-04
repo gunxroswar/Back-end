@@ -2,7 +2,7 @@ package com.Deadline.BackEnd.Backend.controller;
 import com.Deadline.BackEnd.Backend.Objects.createComment;
 import com.Deadline.BackEnd.Backend.Objects.createPost;
 import com.Deadline.BackEnd.Backend.Objects.login;
-import com.Deadline.BackEnd.Backend.Objects.signup;
+import com.Deadline.BackEnd.Backend.Objects.signin;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
@@ -137,31 +137,16 @@ public class APIcontroller {
     @GetMapping("/posts")
     @CrossOrigin(origins = "http://localhost:3000")
     public String getPost(@RequestParam("postId") int id){
+        String sendBack;
         String QUERY = "SELECT Topic, Detail , TimeStamp, LikeCount FROM Posts WHERE postId = ".concat(id + ";");
-        String topic = "";
-        String detail = "";
-        String timeStamp = "";
-        String likeCount = "";
         try{
             ResultSet rs = stmt.executeQuery(QUERY);
-            while(rs.next()){
-                topic = rs.getString("Topic");
-                detail = rs.getString("Detail");
-                timeStamp = rs.getString("TimeStamp");
-                likeCount = rs.getString("LikeCount");
-            }
+            sendBack = autoPayloadBuilder(rs);
         }
         catch (Exception e) {
             e.printStackTrace();
             return "200";
         }
-
-        String sendBack = "{" +
-                "\"Topic\": \"" + topic + "\"," +
-                "\"Detail\": \"" + detail + "\"," +
-                "\"TimeStamp\": \"" + timeStamp + "\"," +
-                "\"LikeCount\": \"" + likeCount + "\"" +
-                "}";
 
         return sendBack;
     }
@@ -169,50 +154,21 @@ public class APIcontroller {
     @GetMapping("/pages")
     @CrossOrigin(origins = "http://localhost:3000")
     public String getPage(@RequestParam("page") int id){
-        String QUERY = "SELECT PostID, PostOwner, Topic, Detail , TimeStamp, LikeCount, hasVerify FROM Posts ORDER BY TimeStamp DESC LIMIT 10;";
-        String postID = "";
-        String postOwner = "";
-        String topic = "";
-        String detail = "";
-        String timeStamp = "";
-        String likeCount = "";
-        String hasVerify = "";
-        String crafter = "";
-        StringBuilder sendBack = new StringBuilder("[");
+        String sendBack;
+        String QUERY = "SELECT PostID, user.username , Topic, Detail , TimeStamp, LikeCount, hasVerify \n" +
+                "FROM Posts \n" +
+                "INNER JOIN user ON PostOwner = user.uid\n" +
+                "ORDER BY TimeStamp DESC LIMIT 10;";
         try{
             ResultSet rs = stmt.executeQuery(QUERY);
-            while(rs.next()){
-                postID = rs.getString("PostID");
-                postOwner = rs.getString("PostOwner");
-                topic = rs.getString("Topic");
-                detail = rs.getString("Detail");
-                timeStamp = rs.getString("TimeStamp");
-                likeCount = rs.getString("LikeCount");
-                hasVerify = rs.getString("hasVerify");
-
-                crafter = "{" +
-                        "\"postID\": \"" + postID + "\"," +
-                        "\"postOwner\": \"" + postOwner + "\"," +
-                        "\"Topic\": \"" + topic + "\"," +
-                        "\"Detail\": \"" + detail + "\"," +
-                        "\"TimeStamp\": \"" + timeStamp + "\"," +
-                        "\"LikeCount\": \"" + likeCount + "\"," +
-                        "\"taglist\": \"" + "[]" + "\"," +
-                        "\"hasVerify\": \"" + hasVerify + "\"" +
-                        "}";
-
-                sendBack.append(crafter).append(",");
-            }
+            sendBack = autoPayloadBuilder(rs);
         }
         catch (Exception e) {
             e.printStackTrace();
             return "200";
         }
 
-        sendBack.deleteCharAt(sendBack.length() - 1);
-        sendBack.append("]");
-
-        return sendBack.toString();
+        return sendBack;
     }
 
     @GetMapping("/comments")
