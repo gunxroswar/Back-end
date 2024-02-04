@@ -1,10 +1,10 @@
 package com.Deadline.BackEnd.Backend.controller;
 import com.Deadline.BackEnd.Backend.Objects.createPost;
 import com.Deadline.BackEnd.Backend.Objects.login;
-import com.Deadline.BackEnd.Backend.Objects.signup;
-import com.Deadline.BackEnd.Backend.model.User;
+import com.Deadline.BackEnd.Backend.Objects.signin;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -14,7 +14,7 @@ public class APIcontroller {
 
     static final String DB_URL = "jdbc:mysql://localhost:3306/backend_database";
     static final String USER = "root";
-    static final String PASS = "admin1234";
+    static final String PASS = "boegy5882";
     Connection conn = null;
     Statement stmt = null;
 
@@ -33,13 +33,15 @@ public class APIcontroller {
             singleData.deleteCharAt(singleData.length()-1);
             singleData.append("}");
             returnData.append(singleData + ",");
-            singleData.delete(0, singleData.length()-1);
+            singleData.delete(0, singleData.length());
         }
 
         returnData.deleteCharAt(returnData.length()-1);
         if(rowCount == 1){
             returnData.deleteCharAt(0);
             return returnData.toString();
+        } else if (rowCount == 0) {
+            return "[]";
         }
         returnData.append("]");
 
@@ -58,7 +60,7 @@ public class APIcontroller {
         return "API Ok";
     }
 
-    @PostMapping("/guests/login")
+    @PostMapping("/guests1/login")
     @CrossOrigin(origins = "http://localhost:3000")
     public String login(@RequestBody login info){
         String QUERY = "SELECT username, password, displayName FROM User ".concat("WHERE username='" + info.userName + "';");
@@ -67,11 +69,11 @@ public class APIcontroller {
         String displayName = null;
         try{
             ResultSet rs = stmt.executeQuery(QUERY);
-            while(rs.next()){
-                existUser = rs.getString("username");
-                existPassword = rs.getString("password");
-                displayName = rs.getString("displayName");
-            }
+            rs.next();
+            existUser = rs.getString("username");
+            existPassword = rs.getString("password");
+            displayName = rs.getString("displayName");
+
             if(existUser == null) return "400";
             else if(!Objects.equals(existPassword, info.password)) return "400";
         }
@@ -85,8 +87,7 @@ public class APIcontroller {
 
     @PostMapping("/guests/signin")
     @CrossOrigin(origins = "http://localhost:3000")
-    public String signin(@RequestBody signup info){
-        //String QUERY = "SELECT username, password FROM User;";
+    public String signin(@RequestBody signin info){
         String QUERY = "INSERT INTO User VALUES ('".concat(info.userName + "', '" + info.password + "', '" + info.displayName + "');");
         try{
             stmt.executeUpdate(QUERY);
@@ -101,30 +102,26 @@ public class APIcontroller {
     @PostMapping("/posts/create")
     @CrossOrigin(origins = "http://localhost:3000")
     public String createPost(@RequestBody createPost cp){
-        int maxPostID = 0;
-        int postOwner = 0;
+        BigInteger postid;
+        int anonymous = 1;
+        String create_at = String.valueOf(new Timestamp(System.currentTimeMillis()));
+        int has_verify = 0;
         String topic = cp.Payload.topic;
-        String timeStamp = String.valueOf(new Timestamp(System.currentTimeMillis()));
         String detail = cp.Payload.detail;
-        int likeCount = 0;
-        int annoymous = 0;
-        int hasVerify = 0;
-        int postStatus = 0;
+        String update_at = create_at;
+        BigInteger post_status_id = BigInteger.valueOf(1);
+        BigInteger owner_id = BigInteger.valueOf(1);
+        BigInteger like_count = BigInteger.valueOf(1);
+        BigInteger status_id = BigInteger.valueOf(1);
 
-        String MAXIndexQUERY = "SELECT MAX(PostID) FROM Posts;";
-        try{
-            ResultSet rs = stmt.executeQuery(MAXIndexQUERY);
-            while(rs.next()){
-                maxPostID = rs.getInt("MAX(PostID)")+1;
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return "200";
-        }
 
-        String QUERY = "INSERT INTO Posts VALUES (".concat(maxPostID + ", " + postOwner + ", '" + topic + "', '" + timeStamp + "', '" + detail + "', " + likeCount + ", " + annoymous + ", " + hasVerify + ", " + postStatus + ");");
+        String QUERY = "SELECT MAX(PostID) FROM post;";
         try{
+            ResultSet rs = stmt.executeQuery(QUERY);
+            rs.next();
+            postid = BigInteger.valueOf(rs.getLong("MAX(PostID)"));
+            postid = postid.add(BigInteger.valueOf(1));
+            QUERY = "INSERT INTO post VALUES (" + postid + ", " + anonymous + ", '" + create_at + "', '" + detail + "', " + has_verify + ", '" + topic + "', '" + update_at + "', " + post_status_id + ", " + owner_id + ", " + like_count + ", "  + status_id + ");";
             stmt.executeUpdate(QUERY);
         }
         catch (Exception e) {
@@ -171,6 +168,67 @@ public class APIcontroller {
         }
 
         return sendBack;
+    }
+
+    @GetMapping("/comments")
+    @CrossOrigin(origins = "http://localhost:3000")
+    public String getComment(@RequestParam("commentId") int post_id){
+        String sendBack;
+        String QUERY =
+                "SELECT commentid as 'CommentID', user.name as 'displayName', like_count as 'LikeAmount', is_verify as 'hasVerify', 0 as 'replyAmount', create_at as 'CreateDate', detail\n" +
+                "FROM comment\n" +
+                "INNER JOIN user ON user.uid = comment.ower_id\n" +
+                "WHERE comment.post_id = " + post_id + ";";
+
+        try{
+            ResultSet rs = stmt.executeQuery(QUERY);
+            sendBack = autoPayloadBuilder(rs);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return "200";
+        }
+
+        return sendBack;
+    }
+
+    @PostMapping("/comments/create")
+    @CrossOrigin(origins = "http://localhost:3000")
+    public String createComment(@RequestBody createComment info){
+        BigInteger commentid;
+        int anonymous = 1;
+        String create_at = String.valueOf(new Timestamp(System.currentTimeMillis()));
+        String detail = info.Payload.detail;
+        int is_verify = 0;
+        String topic;
+        String update_at = create_at;
+        BigInteger post_id = info.Payload.PostID;
+        BigInteger post_status_id = BigInteger.valueOf(1);
+        BigInteger owner_id = BigInteger.valueOf(1);
+        BigInteger like_count = BigInteger.valueOf(1);
+        String QUERY;
+        try{
+            QUERY = "SELECT MAX(commentid) FROM comment;";
+            ResultSet rs = stmt.executeQuery(QUERY);
+            rs.next();
+            commentid = BigInteger.valueOf(rs.getLong("MAX(commentid)"));
+            commentid = commentid.add(BigInteger.valueOf(1));
+
+            QUERY = "SELECT Topic FROM Posts WHERE Posts.PostID = " + info.Payload.PostID + ";";
+            rs = stmt.executeQuery(QUERY);
+            rs.next();
+            topic = rs.getString("Topic");
+
+            QUERY = "INSERT INTO comment VALUES (" + commentid + ", " + anonymous + ", '" + create_at + "', '" + detail + "', " + is_verify + ", '" + topic + "', '" + update_at + "', " + post_id + ", " + post_status_id + ", " + owner_id + ", " + like_count + ");";
+            stmt.executeUpdate(QUERY);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return "200";
+        }
+
+
+       return "201";
     }
 
     /*

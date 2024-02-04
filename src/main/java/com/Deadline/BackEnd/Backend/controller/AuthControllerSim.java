@@ -76,18 +76,23 @@ public class AuthControllerSim {
         return new ResponseEntity<String>("Success", HttpStatus.CREATED);
     }
 
-//    @PostMapping("/guest/login")
-//    public boolean login(@RequestBody User u){
-//        long id = -1;
-//        for (int i = 0 ;i<user.size();i++){
-//            if (u.getUsername().equals(user.get(i).getUsername())){
-//                id = i;
-//            }
-//        }
-//        if(u.getPassword().equals(user.get((int) id).getPassword())){
-//            return true;
-//        }
-//        return false;
-//    }
+    @PostMapping("/guests/login")
+    @CrossOrigin(origins = "http://localhost:3000")
+    public ResponseEntity<String> login(@RequestBody User u){
+        List<User> user=userRepository.findByUsername(u.getUsername());
+        String sha256hex = Hashing.sha256()
+                .hashString(u.getPassword(), StandardCharsets.UTF_8)
+                .toString();
+        if(user.isEmpty()){
+            return ResponseEntity.badRequest().body("Incorrect");
+        }else if(sha256hex.equals(user.get(0).getPassword())){
+            return new ResponseEntity("Success", HttpStatus.OK);
+        }else{
+            return ResponseEntity.badRequest().body("Incorrect");
+        }
+    }
+
+
+
 
 }

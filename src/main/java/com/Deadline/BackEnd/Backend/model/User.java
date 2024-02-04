@@ -52,7 +52,9 @@ public class User {
     @OneToMany(mappedBy = "user")
     private Set<Post> posts;
 
-
+    @OneToOne
+    @PrimaryKeyJoinColumn
+    private Cookie cookie;
 
     @ManyToMany
     @JoinTable(
