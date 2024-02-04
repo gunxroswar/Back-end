@@ -54,7 +54,9 @@ public class User {
     @OneToMany(mappedBy = "user")
     private Set<PostBody> posts;
 
-
+    @OneToOne
+    @PrimaryKeyJoinColumn
+    private Cookie cookie;
 
     @ManyToMany
     @JoinTable(

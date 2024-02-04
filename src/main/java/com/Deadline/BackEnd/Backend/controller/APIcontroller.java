@@ -13,7 +13,7 @@ public class APIcontroller {
 
     static final String DB_URL = "jdbc:mysql://localhost:3306/backend_database";
     static final String USER = "root";
-    static final String PASS = "Kw050x\\>RaoM/WJO";
+    static final String PASS = "boegy5882";
     Connection conn = null;
     Statement stmt = null;
 
@@ -57,7 +57,7 @@ public class APIcontroller {
         return "API Ok";
     }
 
-    @PostMapping("/guests/login")
+    @PostMapping("/guests1/login")
     @CrossOrigin(origins = "http://localhost:3000")
     public String login(@RequestBody login info){
         String QUERY = "SELECT username, password, displayName FROM User ".concat("WHERE username='" + info.userName + "';");
@@ -84,7 +84,7 @@ public class APIcontroller {
 
     @PostMapping("/guests/signin")
     @CrossOrigin(origins = "http://localhost:3000")
-    public String signin(@RequestBody signin info){
+    public String signin(@RequestBody signup info){
         //String QUERY = "SELECT username, password FROM User;";
         String QUERY = "INSERT INTO User VALUES ('".concat(info.userName + "', '" + info.password + "', '" + info.displayName + "');");
         try{
