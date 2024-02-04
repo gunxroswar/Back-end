@@ -20,8 +20,9 @@ public class AuthControllerSim {
     }
 
     @PostMapping("/guests/register")
-    public void register(@RequestBody User u){
+    public String register(@RequestBody User u){
         user.add(new User(counter.getAndIncrement(),u.getDisplay_name(),u.getUsername(),u.getPassword()));
+        return "Success";
     }
 
     @PostMapping("/guest/login")
