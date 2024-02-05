@@ -1,30 +1,30 @@
 package com.Deadline.BackEnd.Backend.Dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
+import lombok.*;
 
-import javax.validation.constraints.NotEmpty;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class postDto {
+public class ShowPostDto {
     private Long postId;
-    @NotEmpty
-    private String topic;
-    @NotEmpty
-    private String detail;
-    @NotEmpty
     private Long UID;
+    private String name;
+    private String topic;
+
+    private String detail;
+
     private Boolean anonymous;
+    private List<Map<String,String>> taglist;
     private Boolean hasVerify;
     private String status;
+    private Long likeCount;
     private Date createAt;
 
 

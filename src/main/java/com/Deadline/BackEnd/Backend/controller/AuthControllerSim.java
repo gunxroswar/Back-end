@@ -45,16 +45,14 @@ public class AuthControllerSim {
 
     @PostMapping("/guests/signup")
     @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<String> register(@RequestBody @Valid User u, BindingResult bindingResult){
+    public ResponseEntity<String> register(@RequestBody @Valid User u){
         boolean password = true;
         String sha256hex;
         Boolean username = !userRepository.findByUsername(u.getUsername()).isEmpty();
         Boolean profileName= !userRepository.findByProfileName(u.getProfileName()).isEmpty();
 
         try{
-//            if(bindingResult.hasErrors()){
-//                return ;
-//            }
+//
 
             if(u.getPassword().length()<8){
                 password = false;

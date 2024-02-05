@@ -5,8 +5,12 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +25,7 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long postId;
 
-
+    @NotNull(message = "owerID must not be null")
     @ManyToOne
     @JoinColumn(name= "owerId")
     private User user;
@@ -29,20 +33,25 @@ public class Post {
     @OneToMany(mappedBy = "post")
     private List<Comment> commentBodies;
 
+    @NotBlank(message = "topic must not be Blank")
+    @Size(max = 512,message = "topic is at most 512 characters.")
     @Column(nullable = false,length = 512)
     private String topic;
 
+    @NotBlank(message = "detail must not be Blank")
+    @Size(max = 512,message = "topic is at most 4096 characters.")
     @Column(nullable = false,length = 4096)
     private String detail;
+
 
     @Column(nullable = false)
     private Long likeCount;
 
     @Column(nullable = false)
-    private Boolean anonymous;
+    private Boolean anonymous=false;
 
     @Column(nullable = false)
-    private Boolean hasVerify;
+    private Boolean hasVerify=false;
 
 
     @ManyToOne(cascade = CascadeType.ALL)

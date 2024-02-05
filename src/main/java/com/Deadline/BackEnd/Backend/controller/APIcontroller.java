@@ -1,4 +1,5 @@
 package com.Deadline.BackEnd.Backend.controller;
+import com.Deadline.BackEnd.Backend.Objects.createComment;
 import com.Deadline.BackEnd.Backend.Objects.createPost;
 import com.Deadline.BackEnd.Backend.Objects.login;
 import com.Deadline.BackEnd.Backend.Objects.signin;
@@ -14,7 +15,7 @@ public class APIcontroller {
 
     static final String DB_URL = "jdbc:mysql://localhost:3306/backend_database";
     static final String USER = "root";
-    static final String PASS = "boegy5882";
+    static final String PASS = "admin1234";
     Connection conn = null;
     Statement stmt = null;
 

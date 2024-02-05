@@ -7,7 +7,9 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -25,12 +27,12 @@ public class Comment {
     private Long commentId;
 
 
-    @NotNull(message = "postID should not be null")
+    @NotNull(message = "postID must not be null")
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "postId")
     private Post post;
 
-    @NotNull(message = "commentOwerID should not be null")
+    @NotNull(message = "owerID must not be null")
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name= "owerId")
     private User user;
@@ -38,10 +40,13 @@ public class Comment {
     @OneToMany(mappedBy = "comment")
     private List<Reply> replyBodies;
 
-
+    @NotBlank(message = "topic must not be Blank")
+    @Size(max = 512,message = "topic is at most 512 characters.")
     @Column(nullable = false,length = 512)
     private String topic;
 
+    @NotBlank(message = "detail must not be Blank")
+    @Size(max = 512,message = "topic is at most 4096 characters.")
     @Column(nullable = false,length = 4096)
     private String detail;
 
