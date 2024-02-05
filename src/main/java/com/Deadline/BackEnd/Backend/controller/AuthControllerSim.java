@@ -45,14 +45,14 @@ public class AuthControllerSim {
 
     @PostMapping("/guests/signup")
     @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<String> register(@RequestBody @Valid User u){
+    public ResponseEntity<String> register(@RequestBody @Valid User u, BindingResult bindingResult){
         boolean password = true;
         String sha256hex;
-        Boolean username = !userRepository.findByUsername(u.getUsername()).isEmpty();
-        Boolean profileName= !userRepository.findByProfileName(u.getProfileName()).isEmpty();
+        Boolean username = userRepository.findByUsername(u.getUsername()).isEmpty();
+        Boolean profileName= userRepository.findByProfileName(u.getProfileName()).isEmpty();
 
         try{
-//
+
 
             if(u.getPassword().length()<8){
                 password = false;
@@ -84,7 +84,7 @@ public class AuthControllerSim {
         if(user.isEmpty()){
             return ResponseEntity.badRequest().body("Incorrect");
         }else if(sha256hex.equals(user.get(0).getPassword())){
-            return new ResponseEntity("Success", HttpStatus.OK);
+            return new ResponseEntity("{\"profileName\": \""+ user.get(0).getProfileName()+"\", \"Token\": \"" + "" + "\"}", HttpStatus.OK);
         }else{
             return ResponseEntity.badRequest().body("Incorrect");
         }

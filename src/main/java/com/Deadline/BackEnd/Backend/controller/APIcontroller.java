@@ -19,7 +19,7 @@ public class APIcontroller {
     Connection conn = null;
     Statement stmt = null;
 
-    public String autoPayloadBuilder(ResultSet rs) throws SQLException {
+    private String autoPayloadBuilder(ResultSet rs) throws SQLException {
         ResultSetMetaData metaData = rs.getMetaData();
         StringBuilder singleData = new StringBuilder();
         StringBuilder returnData = new StringBuilder();
@@ -50,6 +50,18 @@ public class APIcontroller {
         return returnData.toString();
     }
 
+    private boolean IsSQLInjection(String value){
+        try{
+            ResultSet rs = stmt.executeQuery(
+                    "SELECT * FROM sqlinjection_test\n" +
+                            "WHERE testid = " + value + " AND test_value = " + value + ";");
+            if(rs.next()) return true;
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public APIcontroller() throws SQLException {
         conn = DriverManager.getConnection(DB_URL, USER, PASS);
         stmt = conn.createStatement();
@@ -64,19 +76,18 @@ public class APIcontroller {
     @PostMapping("/guests1/login")
     @CrossOrigin(origins = "http://localhost:3000")
     public String login(@RequestBody login info){
-        String QUERY = "SELECT username, password, displayName FROM User ".concat("WHERE username='" + info.userName + "';");
-        String existUser = null;
-        String existPassword = null;
-        String displayName = null;
+        if(IsSQLInjection(info.userName)) return "401 Unauthorized";
+        String QUERY = "SELECT username, password, profile_name FROM user ".concat("WHERE username='" + info.userName + "';");
+        String existUser = "null";
+        String existPassword = "null";
+        String displayName = "null";
         try{
             ResultSet rs = stmt.executeQuery(QUERY);
-            rs.next();
+            if(!rs.next()) return "User name or password incorrect";
             existUser = rs.getString("username");
             existPassword = rs.getString("password");
+            if(!Objects.equals(existPassword, info.password)) return "User name or password incorrect";
             displayName = rs.getString("displayName");
-
-            if(existUser == null) return "400";
-            else if(!Objects.equals(existPassword, info.password)) return "400";
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -109,8 +120,6 @@ public class APIcontroller {
         int has_verify = 0;
         String topic = cp.Payload.topic;
         String detail = cp.Payload.detail;
-        String update_at = create_at;
-        BigInteger post_status_id = BigInteger.valueOf(1);
         BigInteger owner_id = BigInteger.valueOf(1);
         BigInteger like_count = BigInteger.valueOf(1);
         BigInteger status_id = BigInteger.valueOf(1);
@@ -122,7 +131,7 @@ public class APIcontroller {
             rs.next();
             postid = BigInteger.valueOf(rs.getLong("MAX(PostID)"));
             postid = postid.add(BigInteger.valueOf(1));
-            QUERY = "INSERT INTO post VALUES (" + postid + ", " + anonymous + ", '" + create_at + "', '" + detail + "', " + has_verify + ", '" + topic + "', '" + update_at + "', " + post_status_id + ", " + owner_id + ", " + like_count + ", "  + status_id + ");";
+            QUERY = "INSERT INTO post VALUES (" + postid + ", " + anonymous + ", '" + create_at + "', '" + detail + "', " + has_verify + ", " + like_count + ", " + ", '" + topic + "', '" + create_at + "', " + status_id + ", "  + owner_id + ");";
             stmt.executeUpdate(QUERY);
         }
         catch (Exception e) {
@@ -202,7 +211,6 @@ public class APIcontroller {
         String detail = info.Payload.detail;
         int is_verify = 0;
         String topic;
-        String update_at = create_at;
         BigInteger post_id = info.Payload.PostID;
         BigInteger post_status_id = BigInteger.valueOf(1);
         BigInteger owner_id = BigInteger.valueOf(1);
@@ -220,7 +228,7 @@ public class APIcontroller {
             rs.next();
             topic = rs.getString("Topic");
 
-            QUERY = "INSERT INTO comment VALUES (" + commentid + ", " + anonymous + ", '" + create_at + "', '" + detail + "', " + is_verify + ", '" + topic + "', '" + update_at + "', " + post_id + ", " + post_status_id + ", " + owner_id + ", " + like_count + ");";
+            QUERY = "INSERT INTO comment VALUES (" + commentid + ", " + anonymous + ", '" + create_at + "', '" + detail + "', " + is_verify + ", '" + topic + "', '" + create_at + "', " + post_id + ", " + post_status_id + ", " + owner_id + ", " + like_count + ");";
             stmt.executeUpdate(QUERY);
         }
         catch (Exception e) {
