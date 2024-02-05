@@ -1,9 +1,7 @@
 package com.Deadline.BackEnd.Backend.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -12,13 +10,18 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Entity
 @Data
+@Builder
 @Getter
 @Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name="POST")
 public class Post {
     @Id
@@ -45,7 +48,7 @@ public class Post {
 
 
     @Column(nullable = false)
-    private Long likeCount;
+    private Long likeCount= 0L;
 
     @Column(nullable = false)
     private Boolean anonymous=false;
@@ -70,7 +73,7 @@ public class Post {
     private Set<User> userBookmarks;
 
     @ManyToMany(mappedBy = "postWithTags")
-    private Set<TagName> tagNames;
+    private Set<TagName> tagNames = new HashSet<>();
 
     @ManyToMany
     @JoinTable(

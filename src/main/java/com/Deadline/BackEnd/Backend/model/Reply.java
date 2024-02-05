@@ -1,9 +1,7 @@
 package com.Deadline.BackEnd.Backend.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -17,6 +15,9 @@ import java.util.Set;
 @Data
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name="REPLY")
 public class Reply {
     @Id
