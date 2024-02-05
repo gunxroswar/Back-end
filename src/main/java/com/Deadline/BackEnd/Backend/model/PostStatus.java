@@ -20,10 +20,10 @@ public class PostStatus {
     @Column(nullable = false)
     private String postStatusName;
     @OneToMany(mappedBy = "statusOfPost")
-    private List<PostBody> postBodies;
+    private List<Post> postBodies;
     @OneToMany(mappedBy = "statusOfComment")
-    private List<CommentBody> commentBodies;
+    private List<Comment> commentBodies;
     @OneToMany(mappedBy = "statusOfReply")
-    private List<ReplyBody> replyBodies ;
+    private List<Reply> replyBodies ;
 
 }
