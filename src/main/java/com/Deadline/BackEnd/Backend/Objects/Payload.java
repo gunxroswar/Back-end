@@ -5,6 +5,7 @@ import java.math.BigInteger;
 public class Payload {
     public BigInteger PostID;
     public String topic;
+    public String tag;
     public String detail;
     public String cookie;
 }
