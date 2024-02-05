@@ -1,5 +1,4 @@
 package com.Deadline.BackEnd.Backend.controller;
-import com.Deadline.BackEnd.Backend.Objects.createComment;
 import com.Deadline.BackEnd.Backend.Objects.createPost;
 import com.Deadline.BackEnd.Backend.Objects.login;
 import com.Deadline.BackEnd.Backend.Objects.signin;
@@ -15,7 +14,7 @@ public class APIcontroller {
 
     static final String DB_URL = "jdbc:mysql://localhost:3306/backend_database";
     static final String USER = "root";
-    static final String PASS = "Kw050x\\>RaoM/WJO";
+    static final String PASS = "boegy5882";
     Connection conn = null;
     Statement stmt = null;
 
@@ -73,7 +72,7 @@ public class APIcontroller {
         return "API Ok";
     }
 
-    @PostMapping("/guests/login")
+    @PostMapping("/guests1/login")
     @CrossOrigin(origins = "http://localhost:3000")
     public String login(@RequestBody login info){
         if(IsSQLInjection(info.userName)) return "401 Unauthorized";

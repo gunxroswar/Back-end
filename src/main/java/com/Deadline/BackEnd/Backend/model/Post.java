@@ -15,51 +15,61 @@ import java.util.Set;
 @Data
 @Getter
 @Setter
-@Table(name="REPLY")
-public class ReplyBody {
+@Table(name="POST")
+public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "REPLYID")
-    private Long replyID;
+    private Long postId;
 
-//    @Column(name = "COMMENTID")
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "commetId")
-    private CommentBody comment ;
-//    @Column(name = "REPLYOWER",nullable = false)
-
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name= "owerId")
     private User user;
+
+    @OneToMany(mappedBy = "post")
+    private List<Comment> commentBodies;
 
     @Column(nullable = false,length = 512)
     private String topic;
 
     @Column(nullable = false,length = 4096)
     private String detail;
+
     @Column(nullable = false)
-    private Long likeCount ;
+    private Long likeCount;
+
     @Column(nullable = false)
-    private Boolean anonymous = false;
+    private Boolean anonymous;
+
     @Column(nullable = false)
-    private Boolean isVerify =  false;
+    private Boolean hasVerify;
+
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name= "postStatusId")
-    private  PostStatus statusOfReply;
+    @JoinColumn(name= "StatusId")
+    private  PostStatus statusOfPost;
 
     @CreationTimestamp
     @Column(name = "CreateAt",nullable = false,updatable = false)
     private Date createAt;
+
     @UpdateTimestamp
     @Column(name = "UpdateAt")
     private Date updateAt;
+
+    @ManyToMany(mappedBy = "bookmarkPosts")
+    private Set<User> userBookmarks;
+
+    @ManyToMany(mappedBy = "postWithTags")
+    private Set<TagName> tagNames;
+
     @ManyToMany
     @JoinTable(
-            name = "like_reply",
-            joinColumns = @JoinColumn(name = "replyId"),
+            name = "like_post",
+            joinColumns = @JoinColumn(name = "postId"),
             inverseJoinColumns = @JoinColumn(name = "userId")
     )
-    private Set<User> userLikeReply;
+    private Set<User> userLikePost;
+
+
 }
