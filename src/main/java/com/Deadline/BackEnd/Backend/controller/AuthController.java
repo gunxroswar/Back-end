@@ -3,7 +3,9 @@ package com.Deadline.BackEnd.Backend.controller;
 import com.Deadline.BackEnd.Backend.Dto.AuthResponseDto;
 import com.Deadline.BackEnd.Backend.Dto.LoginDto;
 import com.Deadline.BackEnd.Backend.Dto.SignUpDto;
+import com.Deadline.BackEnd.Backend.model.Cookie;
 import com.Deadline.BackEnd.Backend.model.User;
+import com.Deadline.BackEnd.Backend.repository.CookieRepository;
 import com.Deadline.BackEnd.Backend.repository.RoleRepository;
 import com.Deadline.BackEnd.Backend.repository.UserRepository;
 import com.Deadline.BackEnd.Backend.security.JWTAuthenticationFilter;
@@ -27,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Optional;
 
 @RestController
@@ -40,12 +44,14 @@ public class AuthController {
     private RoleRepository roleRepository;
     //@Autowired
     private PasswordEncoder passwordEncoder;
+    // @Autowired
+    private CookieRepository cookieRepository;
    // @Autowired
     private JWTGenerator jwtGenerator;
 
     @Autowired
     public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository,
-                          RoleRepository roleRepository, PasswordEncoder passwordEncoder, JWTGenerator jwtGenerator) {
+                          RoleRepository roleRepository, PasswordEncoder passwordEncoder, CookieRepository cookieRepository, JWTGenerator jwtGenerator) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
@@ -58,17 +64,37 @@ public class AuthController {
         String sha256hex = Hashing.sha256()
                 .hashString(loginDto.getPassword(), StandardCharsets.UTF_8)
                 .toString();
-//        Authentication authentication = authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(
-//                        loginDto.getUsername(),
-//                        sha256hex.toString()
-//                ));
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginDto.getUsername(),
+                        sha256hex.toString()
+                ));
+
         String token = "Ok"; /*jwtGenerator.GenerateToken(authentication);*/
         Optional<User> user = userRepository.findByUsername(loginDto.getUsername());
 
         if (user.isEmpty()) {
             return new ResponseEntity<>("You might not be sign up yet. ", HttpStatus.BAD_REQUEST);
         } else if ((sha256hex.equals(user.get().getPassword()))) {
+            String cookieHash = jwtGenerator.GenerateToken(authentication);
+            Optional<Cookie> cookie = cookieRepository.findByUser(user.get().getUsername());
+            if(cookie.isEmpty()){
+                Cookie newCookie = new Cookie();
+                newCookie.setUser(user.get().getUid());
+                newCookie.setCookie(cookieHash);
+                newCookie.setCookieId(
+                        (cookieRepository.findCookieWithMaxId()
+                        .map(Cookie::getCookieId) // Extract the price from the Product
+                        .orElse(0))+1
+                        );
+                newCookie.setUpdateAt(new Date());
+                cookieRepository.save(newCookie);
+            }
+            else{
+                cookie.get().setUpdateAt(new Date());
+                cookieRepository.save(cookie.get());
+            }
+
             return new ResponseEntity<>(token, HttpStatus.OK);
         } else {
             return ResponseEntity.badRequest().body
