@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -38,7 +39,7 @@ public class AuthController {
     //@Autowired
     private RoleRepository roleRepository;
     //@Autowired
-    /*private PasswordEncoder passwordEncoder;*/
+    private PasswordEncoder passwordEncoder;
    // @Autowired
     private JWTGenerator jwtGenerator;
 
@@ -48,31 +49,41 @@ public class AuthController {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-       // this.passwordEncoder = passwordEncoder;
+        this.passwordEncoder = passwordEncoder;
         this.jwtGenerator = jwtGenerator;
     }
 
     @PostMapping("/guest/jwtlogin")
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto){
-
+    public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
         String sha256hex = Hashing.sha256()
                 .hashString(loginDto.getPassword(), StandardCharsets.UTF_8)
                 .toString();
+//        Authentication authentication = authenticationManager.authenticate(
+//                new UsernamePasswordAuthenticationToken(
+//                        loginDto.getUsername(),
+//                        sha256hex.toString()
+//                ));
+        String token = "Ok"; /*jwtGenerator.GenerateToken(authentication);*/
+        Optional<User> user = userRepository.findByUsername(loginDto.getUsername());
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginDto.getUsername(),
-                        Hashing.sha256().hashString(loginDto.getPassword(), StandardCharsets.UTF_8).toString()
-                )
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtGenerator.GenerateToken(authentication);
-        return new ResponseEntity<>(token, HttpStatus.OK);
-    }
+        if (user.isEmpty()) {
+            return new ResponseEntity<>("You might not be sign up yet. ", HttpStatus.BAD_REQUEST);
+        } else if ((sha256hex.equals(user.get().getPassword()))) {
+            return new ResponseEntity<>(token, HttpStatus.OK);
+        } else {
+            return ResponseEntity.badRequest().body
+                    ("Incorrect " + loginDto.getUsername() + " " + loginDto.getPassword() + " " + sha256hex);
+        }
+
+}
+
 
     @PostMapping("/guest/jwtsignup")
     public ResponseEntity<String> signUp(@RequestBody SignUpDto signUpDto){
-        String sha256hex;
+
+        String sha256hex = Hashing.sha256()
+                .hashString(signUpDto.getPassword(), StandardCharsets.UTF_8)
+                .toString();
 
         if(userRepository.existsByUsername(signUpDto.getUsername())){
             return new ResponseEntity<>("Username is taken!", HttpStatus.BAD_REQUEST);
@@ -80,17 +91,13 @@ public class AuthController {
         if(userRepository.existsByProfileName(signUpDto.getName())){
             return new ResponseEntity<>("This profile name is taken!", HttpStatus.BAD_REQUEST);
         }
-        sha256hex = Hashing.sha256().hashString(signUpDto.getPassword(), StandardCharsets.UTF_8).toString();
-
         User user = new User();
         user.setUsername(signUpDto.getUsername());
         user.setPassword(sha256hex);
         user.setProfileName(signUpDto.getName());
-
         userRepository.save(user);
 
         return new ResponseEntity<>("Signup new user complete", HttpStatus.OK);
-
     }
 
     @PostMapping("/pika")
