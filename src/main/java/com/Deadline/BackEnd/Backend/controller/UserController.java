@@ -15,6 +15,11 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+    @GetMapping("/hello")
+    public  String hello()
+    {
+        return  "hello";
+    }
 
     @PostMapping("/userx05")
     User newUser(@RequestBody User newUser) {

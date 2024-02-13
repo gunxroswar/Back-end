@@ -8,9 +8,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @Data
-public class LoginDto {
+public class SignUpDto {
 
     private String username;
 
     private String password;
+
+    private String name;
 }

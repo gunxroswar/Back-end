@@ -15,9 +15,9 @@ import java.util.Objects;
 @RestController
 public class APIcontroller {
 
-    static final String DB_URL = "jdbc:mysql://localhost:3306/backend_database";
-    static final String USER = "root";
-    static final String PASS = "Kw050x\\>RaoM/WJO";
+    static final String DB_URL = "jdbc:mysql://localhost:3306/albaz";
+    static final String USER = "gunxroswar";
+    static final String PASS = "Gxz171477940*";
     Connection conn = null;
     Statement stmt = null;
 

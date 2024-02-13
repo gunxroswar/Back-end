@@ -5,7 +5,6 @@ import com.Deadline.BackEnd.Backend.repository.UserRepository;
 import com.google.common.hash.Hashing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,10 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.nio.charset.StandardCharsets;
-import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 
@@ -35,7 +33,7 @@ public class AuthControllerSim {
 
     @PostMapping("/guests55/signup")
     @CrossOrigin(origins = "http://localhost:3000")
-    public List<User> getUername(@RequestBody User u)
+    public Optional<User> getUername(@RequestBody User u)
     {
         return userRepository.findByUsername(u.getUsername());
     }
@@ -52,8 +50,6 @@ public class AuthControllerSim {
         Boolean profileName= userRepository.findByProfileName(u.getProfileName()).isEmpty();
 
         try{
-
-
             if(u.getPassword().length()<8){
                 password = false;
             }
@@ -77,14 +73,14 @@ public class AuthControllerSim {
     @PostMapping("/guests/login")
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> login(@RequestBody User u){
-        List<User> user=userRepository.findByUsername(u.getUsername());
+        Optional<User> user=userRepository.findByUsername(u.getUsername());
         String sha256hex = Hashing.sha256()
                 .hashString(u.getPassword(), StandardCharsets.UTF_8)
                 .toString();
         if(user.isEmpty()){
             return ResponseEntity.badRequest().body("Incorrect");
-        }else if(sha256hex.equals(user.get(0).getPassword())){
-            return new ResponseEntity("{\"profileName\": \""+ user.get(0).getProfileName()+"\", \"Token\": \"" + "" + "\"}", HttpStatus.OK);
+        }else if(sha256hex.equals(user.get().getPassword())){
+            return new ResponseEntity("{\"profileName\": \""+ user.get().getProfileName()+"\", \"Token\": \"" + "" + "\"}", HttpStatus.OK);
         }else{
             return ResponseEntity.badRequest().body("Incorrect");
         }

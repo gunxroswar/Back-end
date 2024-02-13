@@ -23,9 +23,10 @@ public class User {
 
     private String imageDir = "image.png";
 
-    @ManyToOne
-    @JoinColumn(name = "roleId")
-    private Role role ;
+//    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+//    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+//            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+//    private List<Role> roles = new ArrayList<>();
 
     @NotBlank(message= "ProfileName must not be blank")
     @Size(min = 2 ,message = "ProfileName must be more than 2 character")
@@ -52,9 +53,6 @@ public class User {
     @OneToMany(mappedBy = "user")
     private Set<Post> posts;
 
-    @OneToOne
-    @PrimaryKeyJoinColumn
-    private Cookie cookie;
 
     @ManyToMany
     @JoinTable(
