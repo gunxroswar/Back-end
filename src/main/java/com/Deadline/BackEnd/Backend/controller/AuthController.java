@@ -3,6 +3,7 @@ package com.Deadline.BackEnd.Backend.controller;
 import com.Deadline.BackEnd.Backend.Dto.UserDto;
 import com.Deadline.BackEnd.Backend.model.User;
 import com.Deadline.BackEnd.Backend.service.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,8 @@ public class AuthController {
         model.addAttribute("user", user);
         return "register";
     }
+
+
 
 //    public String registration(@Valid @ModelAttribute("user") UserDto userDto, BindingResult result, Model model){
 //

@@ -1,17 +1,12 @@
 package com.Deadline.BackEnd.Backend.controller;
 
 import com.Deadline.BackEnd.Backend.Dto.ShowPostDto;
-import com.Deadline.BackEnd.Backend.Dto.NewPostDto;
 import com.Deadline.BackEnd.Backend.exception.PostNotFoundExcetion;
-import com.Deadline.BackEnd.Backend.exception.UerNotFoundExcetion;
 import com.Deadline.BackEnd.Backend.model.Post;
-import com.Deadline.BackEnd.Backend.model.PostStatus;
-import com.Deadline.BackEnd.Backend.model.User;
 import com.Deadline.BackEnd.Backend.repository.PostRepository;
 import com.Deadline.BackEnd.Backend.repository.StatusRepository;
 import com.Deadline.BackEnd.Backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

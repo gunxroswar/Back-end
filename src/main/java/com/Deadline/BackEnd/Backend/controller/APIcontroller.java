@@ -17,7 +17,7 @@ public class APIcontroller {
 
     static final String DB_URL = "jdbc:mysql://localhost:3306/backend_database";
     static final String USER = "root";
-    static final String PASS = "Kw050x\\>RaoM/WJO";
+    static final String PASS = "Admin1234";
     Connection conn = null;
     Statement stmt = null;
 
