@@ -36,6 +36,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         req->req.requestMatchers("/guests/signup","/guests/login")
                                 .permitAll()
+                                .requestMatchers("/**")
+                                .permitAll()
                                 .requestMatchers("/admin_mode/**")
                                 .hasAuthority("ADMIN")
                                 .anyRequest()
