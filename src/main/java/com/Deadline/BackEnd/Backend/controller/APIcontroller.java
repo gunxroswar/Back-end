@@ -106,104 +106,54 @@ public class APIcontroller {
         return new ResponseEntity<>("{\"displayName\": \"" + info.displayName + "\"}", HttpStatus.OK);
     }
 
-    @PostMapping("/posts/create")
-    @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<String> createPost(@RequestBody createPost cp){
-        BigInteger postid;
-        int anonymous = 1;
-        String create_at = String.valueOf(new Timestamp(System.currentTimeMillis()));
-        int has_verify = 0;
-        String topic = cp.topic;
-        String tag = cp.tag;
-        String detail = cp.detail;
-        BigInteger owner_id = BigInteger.valueOf(1);
-        BigInteger like_count = BigInteger.valueOf(1);
-        BigInteger status_id = BigInteger.valueOf(1);
-
-
-        String QUERY = "SELECT MAX(id) FROM post;";
-        try{
-            ResultSet rs = stmt.executeQuery(QUERY);
-            rs.next();
-            postid = BigInteger.valueOf(rs.getLong("MAX(id)"));
-            postid = postid.add(BigInteger.valueOf(1));
-            QUERY = "INSERT INTO post VALUES (" + postid + ", " + anonymous + ", '" + create_at + "', '" + detail + "', " + has_verify + ", " + like_count + ", '" + topic + "', '" + create_at + "', " + status_id + ", "  + owner_id + ");";
-            stmt.executeUpdate(QUERY);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body("200");
-        }
-
-
-        return new ResponseEntity<>("OK", HttpStatus.CREATED);
-    }
-
-    @GetMapping("/posts")
-    @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<String> getPost(@RequestParam("postId") int id){
-        String sendBack;
-        String QUERY = "SELECT topic, detail , create_at, like_count, '[]' as taglist FROM post WHERE id = ".concat(id + ";");
-        try{
-            ResultSet rs = stmt.executeQuery(QUERY);
-            sendBack = autoPayloadBuilder(rs);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        return new ResponseEntity<>(sendBack, HttpStatus.OK);
-    }
-
-    @GetMapping("/pages")
-    @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<String> getPage(@RequestParam("page") int id){
-        String sendBack;
-        String QUERY =
-                "SELECT id, user.profile_name , topic, detail , create_at, like_count, has_verify, '[]' as taglist, comment.commentCount\n" +
-                        "FROM ( post INNER JOIN user ON post.ower_id = user.uid )\n" +
-                        "JOIN ( \n" +
-                        "SELECT COUNT(comment.comment_id) as commentCount, post.id as commentOwner\n" +
-                        "FROM post \n" +
-                        "LEFT JOIN comment on post.id = comment.post_id  \n" +
-                        "GROUP BY post.id\n" +
-                        "ORDER BY post.create_at DESC LIMIT 10\n" +
-                        ") as comment ON comment.commentOwner = id\n" +
-                        "ORDER BY create_at DESC LIMIT 10;";
-        try{
-            ResultSet rs = stmt.executeQuery(QUERY);
-            sendBack = autoPayloadBuilder(rs);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body("200");
-        }
-
-        return new ResponseEntity<>("[" + sendBack + "]", HttpStatus.OK);
-    }
-
-    @GetMapping("/comments")
-    @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<String> getComment(@RequestParam("commentId") int post_id){
-        String sendBack;
-        String QUERY =
-                "SELECT comment_id as 'CommentID', user.profile_name as 'displayName', like_count as 'LikeAmount', is_verify as 'hasVerify', 0 as 'replyAmount', create_at as 'CreateDate', detail\n" +
-                "FROM comment\n" +
-                "INNER JOIN user ON user.uid = comment.ower_id\n" +
-                "WHERE comment.post_id = " + post_id + ";";
-
-        try{
-            ResultSet rs = stmt.executeQuery(QUERY);
-            sendBack = autoPayloadBuilder(rs);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body("200");
-        }
-
-        return new ResponseEntity<>("[" + sendBack + "]", HttpStatus.OK);
-    }
+//    @GetMapping("/pages")
+//    @CrossOrigin(origins = "http://localhost:3000")
+//    public ResponseEntity<String> getPage(@RequestParam("page") int id){
+//        String sendBack;
+//        String QUERY =
+//                "SELECT id, user.profile_name , topic, detail , create_at, like_count, has_verify, '[]' as taglist, comment.commentCount\n" +
+//                        "FROM ( post INNER JOIN user ON post.ower_id = user.uid )\n" +
+//                        "JOIN ( \n" +
+//                        "SELECT COUNT(comment.comment_id) as commentCount, post.id as commentOwner\n" +
+//                        "FROM post \n" +
+//                        "LEFT JOIN comment on post.id = comment.post_id  \n" +
+//                        "GROUP BY post.id\n" +
+//                        "ORDER BY post.create_at DESC LIMIT 10\n" +
+//                        ") as comment ON comment.commentOwner = id\n" +
+//                        "ORDER BY create_at DESC LIMIT 10;";
+//        try{
+//            ResultSet rs = stmt.executeQuery(QUERY);
+//            sendBack = autoPayloadBuilder(rs);
+//        }
+//        catch (Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity.internalServerError().body("200");
+//        }
+//
+//        return new ResponseEntity<>("[" + sendBack + "]", HttpStatus.OK);
+//    }
+//
+//    @GetMapping("/comments")
+//    @CrossOrigin(origins = "http://localhost:3000")
+//    public ResponseEntity<String> getComment(@RequestParam("commentId") int post_id){
+//        String sendBack;
+//        String QUERY =
+//                "SELECT comment_id as 'CommentID', user.profile_name as 'displayName', like_count as 'LikeAmount', is_verify as 'hasVerify', 0 as 'replyAmount', create_at as 'CreateDate', detail\n" +
+//                "FROM comment\n" +
+//                "INNER JOIN user ON user.uid = comment.ower_id\n" +
+//                "WHERE comment.post_id = " + post_id + ";";
+//
+//        try{
+//            ResultSet rs = stmt.executeQuery(QUERY);
+//            sendBack = autoPayloadBuilder(rs);
+//        }
+//        catch (Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity.internalServerError().body("200");
+//        }
+//
+//        return new ResponseEntity<>("[" + sendBack + "]", HttpStatus.OK);
+//    }
 
     @PostMapping("/comments/create")
     @CrossOrigin(origins = "http://localhost:3000")

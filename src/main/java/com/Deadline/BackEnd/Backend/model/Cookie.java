@@ -22,7 +22,7 @@ public class Cookie {
 
  @OneToOne
  @JoinColumn(name = "userId" , referencedColumnName = "uid")
- private Long user;
+ private User user;
 
  @Column(unique = true,nullable = false)
  private String cookie;
