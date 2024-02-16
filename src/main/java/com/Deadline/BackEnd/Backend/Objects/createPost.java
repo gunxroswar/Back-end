@@ -1,8 +1,15 @@
 package com.Deadline.BackEnd.Backend.Objects;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@Data
 public class createPost {
-    public String topic;
-    public String tag;
-    public String detail;
-    public String cookie;
+    private String topic;
+    private String tag;
+    private String detail;
+    private String cookie;
 }

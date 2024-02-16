@@ -12,6 +12,9 @@ public interface CookieRepository extends JpaRepository<Cookie,Long> {
     Optional<Cookie> findByUser(User user);
     Optional<Cookie> findByCookie(String cookie);
 
+    //@Query("SELECT MAX(cookieId) FROM cookie")
+    //Optional<Cookie> findCookieWithMaxId();
+
     @Query("SELECT coalesce(max(cookieId), 0) FROM Cookie")
-    Optional<Cookie> findMaxId();
+    int findMaxId();
 }

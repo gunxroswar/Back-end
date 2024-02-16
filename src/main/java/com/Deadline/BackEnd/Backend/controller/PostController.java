@@ -26,13 +26,13 @@ public class PostController {
 
     @PostMapping("/posts/create")
     @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<String> createPost(@RequestBody createPost cp){
+    public ResponseEntity<String> createPost(@RequestBody createPost info){
         Post newPost = new Post();
         Long postId = postRepository.findMaxId()+1L;
         User user = null;
         List<Comment> commentList = new LinkedList<>();
-        String topic = cp.topic;
-        String detail = cp.detail;
+        String topic = info.getTopic();
+        String detail = info.getDetail();
         Long likeCount = 0L;
         Boolean anonymous = false;
         Boolean hasVerify = false;

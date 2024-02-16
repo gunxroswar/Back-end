@@ -1,9 +1,15 @@
 package com.Deadline.BackEnd.Backend.Objects;
 
-public class createComment {
-    public Long PostID;
-    public String topic;
-    public String detail;
-    public String cookie;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
+@Data
+public class createComment {
+    private String postID;
+    private String topic;
+    private String detail;
+    private String cookie;
 }

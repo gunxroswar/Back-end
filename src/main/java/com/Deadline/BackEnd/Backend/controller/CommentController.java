@@ -6,6 +6,7 @@ import com.Deadline.BackEnd.Backend.repository.CommentRepository;
 import com.Deadline.BackEnd.Backend.repository.PostRepository;
 import com.Deadline.BackEnd.Backend.repository.ReplyRepository;
 import org.checkerframework.checker.units.qual.C;
+import org.hibernate.dialect.SybaseASEDialect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
@@ -85,11 +86,11 @@ public class CommentController {
     public ResponseEntity<String> createComment(@RequestBody createComment info){
         Comment newComment = new Comment();
         Long commentId = commentRepository.findMaxId()+1L;
-        Post post = postRepository.findById(info.PostID).get();
+        Post post = postRepository.findById(Long.parseLong(info.getPostID())).get();
         User user = null;
         List<Reply> replyBodies = new LinkedList<>();
-        String topic = info.topic;
-        String detail = info.detail;
+        String topic = info.getTopic();
+        String detail = info.getDetail();
         Long likeCount = 0L;
         Boolean anonymous = false;
         Boolean isVerify = false;

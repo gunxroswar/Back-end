@@ -77,16 +77,17 @@ public class AuthController {
             return new ResponseEntity<>("You might not be sign up yet. ", HttpStatus.BAD_REQUEST);
         } else if ((sha256hex.equals(user.get().getPassword()))) {
             String cookieHash = jwtGenerator.GenerateToken(authentication);
-            Optional<Cookie> cookie = cookieRepository.findByUser(user.get().getUsername());
+            Optional<Cookie> cookie = cookieRepository.findByCookie(cookieHash);
             if(cookie.isEmpty()){
                 Cookie newCookie = new Cookie();
-                newCookie.setUser(user.get().getUid());
+                newCookie.setUser(userRepository.findByUsername(loginDto.getUsername()).get());
                 newCookie.setCookie(cookieHash);
-                newCookie.setCookieId(
-                        (cookieRepository.findCookieWithMaxId()
-                        .map(Cookie::getCookieId) // Extract the price from the Product
-                        .orElse(0))+1
-                        );
+//                newCookie.setCookieId(
+//                        (cookieRepository.findCookieWithMaxId()
+//                        .map(Cookie::getCookieId) // Extract the price from the Product
+//                        .orElse(0))+1
+//                        );
+                newCookie.setCookieId(cookieRepository.findMaxId()+1);
                 newCookie.setUpdateAt(new Date());
                 cookieRepository.save(newCookie);
             }
