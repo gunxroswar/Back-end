@@ -66,7 +66,7 @@ public class PostController {
     @GetMapping("/posts")
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> getPost(@RequestParam("postId") Long id){
-        Optional<Post> search = postRepository.findByPostId(id);
+        Optional<Post> search = postRepository.findById(id);
         StringBuilder sendBack = new StringBuilder();
         if(search.isEmpty()) sendBack.append("[]");
         //"topic, detail , create_at, like_count, '[]' as taglist"

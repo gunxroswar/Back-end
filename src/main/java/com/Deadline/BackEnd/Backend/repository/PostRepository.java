@@ -19,8 +19,6 @@ public interface PostRepository extends JpaRepository<Post,Long> {
     @Query("SELECT coalesce(max(postId), 0) FROM Post")
     Long findMaxId();
 
-    Optional<Post> findByPostId(Long id);
-
     @Query("SELECT p \n" +
             "FROM Post p \n" +
             "ORDER BY createAt DESC LIMIT 10")
