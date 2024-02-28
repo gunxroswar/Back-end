@@ -1,6 +1,8 @@
 package com.Deadline.BackEnd.Backend.controller;
 
 import com.Deadline.BackEnd.Backend.Objects.createPost;
+import com.Deadline.BackEnd.Backend.Objects.editComment;
+import com.Deadline.BackEnd.Backend.Objects.editPost;
 import com.Deadline.BackEnd.Backend.model.*;
 import com.Deadline.BackEnd.Backend.repository.CommentRepository;
 import com.Deadline.BackEnd.Backend.repository.PostRepository;
@@ -59,6 +61,22 @@ public class PostController {
         newPost.setUserLikePost(userLikePost);
 
         postRepository.save(newPost);
+
+        return new ResponseEntity<>("OK", HttpStatus.CREATED);
+    }
+
+    @PostMapping("/posts/edit")
+    @CrossOrigin(origins = "http://localhost:3000")
+    public ResponseEntity<String> editPost(@RequestBody editPost info){
+        Post editPost = postRepository.findById(Long.getLong(info.getPostID)).get();
+        String topic = info.getTopic();
+        String tag = info.getTag();
+        String detail = info.getDetail();
+
+        editPost.setTopic(topic);
+        editPost.setDetail(detail);
+
+        postRepository.save(editPost);
 
         return new ResponseEntity<>("OK", HttpStatus.CREATED);
     }

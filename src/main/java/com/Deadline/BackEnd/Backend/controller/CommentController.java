@@ -1,6 +1,7 @@
 package com.Deadline.BackEnd.Backend.controller;
 
 import com.Deadline.BackEnd.Backend.Objects.createComment;
+import com.Deadline.BackEnd.Backend.Objects.editComment;
 import com.Deadline.BackEnd.Backend.model.*;
 import com.Deadline.BackEnd.Backend.repository.CommentRepository;
 import com.Deadline.BackEnd.Backend.repository.PostRepository;
@@ -114,6 +115,21 @@ public class CommentController {
         newComment.setUserLikeComment(userLikeComment);
 
         commentRepository.save(newComment);
+
+        return new ResponseEntity<>("OK", HttpStatus.CREATED);
+    }
+
+    @PostMapping("/comments/edit")
+    @CrossOrigin(origins = "http://localhost:3000")
+    public ResponseEntity<String> editComment(@RequestBody editComment info){
+        Comment editComment = commentRepository.findById(Long.getLong(info.getCommentID)).get();
+        String topic = info.getTopic();
+        String detail = info.getDetail();
+
+        editComment.setTopic(topic);
+        editComment.setDetail(detail);
+
+        commentRepository.save(editComment);
 
         return new ResponseEntity<>("OK", HttpStatus.CREATED);
     }
