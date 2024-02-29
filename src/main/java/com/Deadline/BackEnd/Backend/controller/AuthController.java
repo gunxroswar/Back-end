@@ -1,125 +1,62 @@
 package com.Deadline.BackEnd.Backend.controller;
 
-import com.Deadline.BackEnd.Backend.Dto.AuthResponseDto;
-import com.Deadline.BackEnd.Backend.Dto.LoginDto;
-import com.Deadline.BackEnd.Backend.Dto.SignUpDto;
+import com.Deadline.BackEnd.Backend.Dto.UserDto;
 import com.Deadline.BackEnd.Backend.model.User;
-import com.Deadline.BackEnd.Backend.repository.RoleRepository;
-import com.Deadline.BackEnd.Backend.repository.UserRepository;
-import com.Deadline.BackEnd.Backend.security.JWTAuthenticationFilter;
-import com.Deadline.BackEnd.Backend.security.JWTGenerator;
-import com.google.common.hash.Hashing;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
+import com.Deadline.BackEnd.Backend.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import javax.validation.Valid;
+import java.util.List;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Optional;
-
-@RestController
-@RequestMapping("/api/auth")
 public class AuthController {
-    //@Autowired
-    private AuthenticationManager authenticationManager;
-    //@Autowired
-    private UserRepository userRepository;
-    //@Autowired
-    private RoleRepository roleRepository;
-    //@Autowired
-    private PasswordEncoder passwordEncoder;
-   // @Autowired
-    private JWTGenerator jwtGenerator;
-
-    @Autowired
-    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository,
-                          RoleRepository roleRepository, PasswordEncoder passwordEncoder, JWTGenerator jwtGenerator) {
-        this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtGenerator = jwtGenerator;
+    //handler method to handle home page request
+    @GetMapping("/index")
+    public String home(){
+        return "index";
     }
 
-    @PostMapping("/guest/jwtlogin")
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
-        String sha256hex = Hashing.sha256()
-                .hashString(loginDto.getPassword(), StandardCharsets.UTF_8)
-                .toString();
-//        Authentication authentication = authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(
-//                        loginDto.getUsername(),
-//                        sha256hex.toString()
-//                ));
-        String token = "Ok"; /*jwtGenerator.GenerateToken(authentication);*/
-        Optional<User> user = userRepository.findByUsername(loginDto.getUsername());
-
-        if (user.isEmpty()) {
-            return new ResponseEntity<>("You might not be sign up yet. ", HttpStatus.BAD_REQUEST);
-        } else if ((sha256hex.equals(user.get().getPassword()))) {
-            return new ResponseEntity<>(token, HttpStatus.OK);
-        } else {
-            return ResponseEntity.badRequest().body
-                    ("Incorrect " + loginDto.getUsername() + " " + loginDto.getPassword() + " " + sha256hex);
-        }
-
-}
-
-
-    @PostMapping("/guest/jwtsignup")
-    public ResponseEntity<String> signUp(@RequestBody SignUpDto signUpDto){
-
-        String sha256hex = Hashing.sha256()
-                .hashString(signUpDto.getPassword(), StandardCharsets.UTF_8)
-                .toString();
-
-        if(userRepository.existsByUsername(signUpDto.getUsername())){
-            return new ResponseEntity<>("Username is taken!", HttpStatus.BAD_REQUEST);
-        }
-        if(userRepository.existsByProfileName(signUpDto.getName())){
-            return new ResponseEntity<>("This profile name is taken!", HttpStatus.BAD_REQUEST);
-        }
-        User user = new User();
-        user.setUsername(signUpDto.getUsername());
-        user.setPassword(sha256hex);
-        user.setProfileName(signUpDto.getName());
-        userRepository.save(user);
-
-        return new ResponseEntity<>("Signup new user complete", HttpStatus.OK);
+    @GetMapping("/registor")
+    public String showRegistrationForm(Model model){
+        UserDto user = new UserDto();
+        model.addAttribute("user", user);
+        return "register";
     }
 
-    @PostMapping("/pika")
-    public String pika(){
-        return "Hi";
-    }
 
-//    @Bean
-//    public AuthenticationManager authenticationManager(
-//            AuthenticationConfiguration authenticationConfiguration) throws Exception {
-//        return authenticationConfiguration.getAuthenticationManager();
-//    }
+
+//    public String registration(@Valid @ModelAttribute("user") UserDto userDto, BindingResult result, Model model){
 //
-//    @Bean
-//    PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
+//        User existingUser = UserService.findUserByUsername(userDto.getUsername()) ;
 //
-//    @Bean
-//    public JWTAuthenticationFilter jwtAuthenticationFilter() {
-//        return new JWTAuthenticationFilter();
+//        //ถ้าอีเมลถูกใช้สมัครแล้ว reject
+//        if(existingUser != null && existingUser.getUsername() != null && !existingUser.getUsername().isEmpty()){
+//            result.rejectValue("username", null,
+//                    "There is already an account registered with the same username");
+//        }
+//
+//        if(result.hasErrors()){
+//            model.addAttribute("user", userDto);
+//            return "/register";
+//        }
+//
+//        UserService.saveUser(userDto);
+//        return "redirect:/register?success";
 //    }
 
+    // handler method to handle list of users
+    @GetMapping("/users")
+    public String users(Model model){
+        List<UserDto> users = UserService.findAllUsers();
+        model.addAttribute("users", users);
+        return "users";
+    }
 
+    @GetMapping("/login")
+    public String login(){
+        return "login";
+    }
 }
