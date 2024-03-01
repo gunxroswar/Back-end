@@ -3,6 +3,7 @@ package com.Deadline.BackEnd.Backend.controller;
 import com.Deadline.BackEnd.Backend.Objects.createPost;
 import com.Deadline.BackEnd.Backend.Objects.editComment;
 import com.Deadline.BackEnd.Backend.Objects.editPost;
+import com.Deadline.BackEnd.Backend.exception.PostNotFoundExcetion;
 import com.Deadline.BackEnd.Backend.model.*;
 import com.Deadline.BackEnd.Backend.repository.CommentRepository;
 import com.Deadline.BackEnd.Backend.repository.PostRepository;
@@ -68,7 +69,10 @@ public class PostController {
     @PostMapping("/posts/edit")
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> editPost(@RequestBody editPost info){
-        Post editPost = postRepository.findById(Long.getLong(info.getPostID)).get();
+        Long editpostId= Long.getLong(info.getPostID());
+        Optional<Post> postOpt= postRepository.findById(editpostId);
+        Post editPost =postOpt.orElseThrow(() -> new PostNotFoundExcetion(editpostId));
+//        Post editPost = postRepository.findById(Long.getLong(info.getPostID())).get();
         String topic = info.getTopic();
         String tag = info.getTag();
         String detail = info.getDetail();

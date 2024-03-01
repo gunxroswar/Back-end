@@ -15,6 +15,7 @@ public interface PostRepository extends JpaRepository<Post,Long> {
 
 //   Post findByPostId(Long postId);
     List<Post> findByUser(User user);
+    Post findByPostId(Long postId);
 
     @Query("SELECT coalesce(max(postId), 0) FROM Post")
     Long findMaxId();

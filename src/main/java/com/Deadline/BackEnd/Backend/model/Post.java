@@ -38,22 +38,22 @@ public class Post {
 
     @NotBlank(message = "topic must not be Blank")
     @Size(max = 512,message = "topic is at most 512 characters.")
-    @Column(nullable = false,length = 512)
+    @Column(nullable = true,length = 512)
     private String topic;
 
     @NotBlank(message = "detail must not be Blank")
     @Size(max = 512,message = "topic is at most 4096 characters.")
-    @Column(nullable = false,length = 4096)
+    @Column(nullable = true,length = 4096)
     private String detail;
 
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Long likeCount= 0L;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Boolean anonymous=false;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Boolean hasVerify=false;
 
 
@@ -62,7 +62,7 @@ public class Post {
     private  PostStatus statusOfPost;
 
     @CreationTimestamp
-    @Column(name = "CreateAt",nullable = false,updatable = false)
+    @Column(name = "CreateAt",nullable = true,updatable = false)
     private Date createAt;
 
     @UpdateTimestamp

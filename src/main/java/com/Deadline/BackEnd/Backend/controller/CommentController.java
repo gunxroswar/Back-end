@@ -122,7 +122,7 @@ public class CommentController {
     @PostMapping("/comments/edit")
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> editComment(@RequestBody editComment info){
-        Comment editComment = commentRepository.findById(Long.getLong(info.getCommentID)).get();
+        Comment editComment = commentRepository.findById(Long.getLong(info.getCommentID())).get();
         String topic = info.getTopic();
         String detail = info.getDetail();
 
