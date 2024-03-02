@@ -69,7 +69,6 @@ private final AuthenticationManager authenticationManager;
         String sha256hex = Hashing.sha256()
                 .hashString(SALT+request.getPassword(), StandardCharsets.UTF_8)
                 .toString();
-
         if(user.isEmpty()){
             return new ResponseEntity<AuthenticationResponse>((AuthenticationResponse) null, HttpStatus.BAD_REQUEST);
         }else if(sha256hex.equals(user.getFirst().getPassword())){

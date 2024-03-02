@@ -16,8 +16,8 @@ public class UserDetailsServiceImp implements UserDetailsService {
     }
 
 
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String uid) throws UsernameNotFoundException {
 
-        return repository.findByUsername(username).getFirst();
+        return repository.findByUid(Long.parseLong(uid)).getFirst();
     }
 }
