@@ -17,7 +17,7 @@ public class APIcontroller {
 
     static final String DB_URL = "jdbc:mysql://localhost:3306/backend_database";
     static final String USER = "root";
-    static final String PASS = "Admin1234";
+    static final String PASS = "boegy5882";
     Connection conn = null;
     Statement stmt = null;
 
@@ -164,7 +164,7 @@ public class APIcontroller {
                 "SELECT id, user.profile_name , topic, detail , create_at, like_count, has_verify, '[]' as taglist, comment.commentCount\n" +
                         "FROM ( post INNER JOIN user ON post.ower_id = user.uid )\n" +
                         "JOIN ( \n" +
-                        "SELECT COUNT(comment.comment_id) as commentCount, post.id as commentOwner\n" +
+                        "SELECT COUNT(comment.commentid) as commentCount, post.id as commentOwner\n" +
                         "FROM post \n" +
                         "LEFT JOIN comment on post.id = comment.post_id  \n" +
                         "GROUP BY post.id\n" +
@@ -188,7 +188,7 @@ public class APIcontroller {
     public ResponseEntity<String> getComment(@RequestParam("commentId") int post_id){
         String sendBack;
         String QUERY =
-                "SELECT comment_id as 'CommentID', user.profile_name as 'displayName', like_count as 'LikeAmount', is_verify as 'hasVerify', 0 as 'replyAmount', create_at as 'CreateDate', detail\n" +
+                "SELECT commentid as 'CommentID', user.profile_name as 'displayName', like_count as 'LikeAmount', is_verify as 'hasVerify', 0 as 'replyAmount', create_at as 'CreateDate', detail\n" +
                 "FROM comment\n" +
                 "INNER JOIN user ON user.uid = comment.ower_id\n" +
                 "WHERE comment.post_id = " + post_id + ";";
@@ -220,10 +220,10 @@ public class APIcontroller {
         BigInteger like_count = BigInteger.valueOf(1);
         String QUERY;
         try{
-            QUERY = "SELECT MAX(comment_id) FROM comment;";
+            QUERY = "SELECT MAX(commentid) FROM comment;";
             ResultSet rs = stmt.executeQuery(QUERY);
             rs.next();
-            commentid = BigInteger.valueOf(rs.getLong("MAX(comment_id)"));
+            commentid = BigInteger.valueOf(rs.getLong("MAX(commentid)"));
             commentid = commentid.add(BigInteger.valueOf(1));
 
             QUERY = "SELECT topic FROM post WHERE post.id = " + info.PostID + ";";
