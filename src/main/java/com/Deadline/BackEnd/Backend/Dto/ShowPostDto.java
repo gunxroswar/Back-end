@@ -17,9 +17,7 @@ public class ShowPostDto {
     private Long UID;
     private String name;
     private String topic;
-
     private String detail;
-
     private Boolean anonymous;
     private List<Map<String,String>> taglist;
     private Boolean hasVerify;

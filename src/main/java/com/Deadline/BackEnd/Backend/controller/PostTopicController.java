@@ -29,40 +29,40 @@ public class PostTopicController {
 //    {
 //        return  null;
 //    }
-    @GetMapping("/test/posts")
-    public ResponseEntity<ShowPostDto> getPost(@RequestParam("postId") Long id)
-    {   ShowPostDto postDto =new ShowPostDto();
-        try
-        {
-            Optional<Post> postOpt= postTopicRepository.findById(id);
-            Post post =postOpt.orElseThrow(() -> new PostNotFoundExcetion(id));
-            String showName;
-            if (post.getAnonymous()){
-                showName ="Anonymous";
-            }
-            else
-            {
-                showName = post.getUser().getProfileName();
-            }
-             postDto.builder()
-                     .postId(post.getPostId())
-                     .UID(post.getUser().getUid())
-                     .name(showName)
-                     .topic(post.getTopic())
-                     .detail(post.getDetail())
-                     .anonymous(post.getAnonymous())
-                     .taglist(new ArrayList<>())
-                     .hasVerify(post.getHasVerify())
-                     .status("ok")
-                     .likeCount(post.getLikeCount())
-                     .createAt(post.getCreateAt())
-                     .build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok().body(postDto);
-    }
+//    @GetMapping("/test/posts")
+//    public ResponseEntity<ShowPostDto> getPost(@RequestParam("postId") Long id)
+//    {   ShowPostDto postDto =new ShowPostDto();
+//        try
+//        {
+//            Optional<Post> postOpt= postTopicRepository.findById(id);
+//            Post post =postOpt.orElseThrow(() -> new PostNotFoundExcetion(id));
+//            String showName;
+//            if (post.getAnonymous()){
+//                showName ="Anonymous";
+//            }
+//            else
+//            {
+//                showName = post.getUser().getProfileName();
+//            }
+//             postDto.builder()
+//                     .postId(post.getPostId())
+//                     .UID(post.getUser().getUid())
+//                     .name(showName)
+//                     .topic(post.getTopic())
+//                     .detail(post.getDetail())
+//                     .anonymous(post.getAnonymous())
+//                     .taglist(new ArrayList<>())
+//                     .hasVerify(post.getHasVerify())
+//                     .status("ok")
+//                     .likeCount(post.getLikeCount())
+//                     .createAt(post.getCreateAt())
+//                     .build();
+//        } catch (Exception e) {
+//            return ResponseEntity.notFound().build();
+//        }
+//
+//        return ResponseEntity.ok().body(postDto);
+//    }
 //    @PostMapping("/test/posts/create")
 //    public ResponseEntity<String> createPost(@RequestBody NewPostDto newPostDto)
 //    {
