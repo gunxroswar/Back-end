@@ -21,5 +21,5 @@ public interface CommentRepository extends JpaRepository<Comment,Long> {
      Long findMaxId();
      Long countByPost(Post post);
 
-     Optional<Comment> findById(String commentId);
+     Optional<Comment> findById(Long commentId);
 }
