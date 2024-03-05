@@ -16,10 +16,7 @@ import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 import java.util.Set;
@@ -40,10 +37,12 @@ public class LikeController {
     public JwtService jwt = new JwtService();
 
     @PutMapping("/post/like")
-    public ResponseEntity<String> likePost(@RequestHeader("Authorization") String authorizationHeader, @PathVariable("post_id") Long postId) {
+    @CrossOrigin(origins = "http://localhost:3000")
+    public ResponseEntity<String> likePost(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("postId") Long postId) {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try {
+            System.out.println("postID = "+(postId));
             Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
             User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= post.getUserLikePost();
@@ -58,7 +57,8 @@ public class LikeController {
         }
     }
     @PutMapping("/post/unlike")
-    public ResponseEntity<String> unlikePost(@RequestHeader("Authorization") String authorizationHeader, @PathVariable("post_id") Long postId) {
+    @CrossOrigin(origins = "http://localhost:3000")
+    public ResponseEntity<String> unlikePost(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("postId") Long postId) {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try {
@@ -77,7 +77,8 @@ public class LikeController {
     }
 
     @PutMapping("/comment/like")
-    public ResponseEntity<String> likeComment(@RequestHeader("Authorization") String authorizationHeader, @PathVariable("comment_id") Long commentId) {
+    @CrossOrigin(origins = "http://localhost:3000")
+    public ResponseEntity<String> likeComment(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("commentId") Long commentId) {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try {
@@ -96,7 +97,8 @@ public class LikeController {
     }
 
     @PutMapping("/comment/unlike")
-    public ResponseEntity<String> unlikeComment(@RequestHeader("Authorization") String authorizationHeader, @PathVariable("comment_id") Long commentId) {
+    @CrossOrigin(origins = "http://localhost:3000")
+    public ResponseEntity<String> unlikeComment(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("commentId") Long commentId) {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try {
@@ -115,7 +117,7 @@ public class LikeController {
     }
 
     @PutMapping("/reply/like")
-    public ResponseEntity<String> likeReply(@RequestHeader("Authorization") String authorizationHeader, @PathVariable("reply_id") Long replyId) {
+    public ResponseEntity<String> likeReply(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("replyId") Long replyId) {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try {
@@ -134,7 +136,7 @@ public class LikeController {
     }
 
     @PutMapping("/reply/unlike")
-    public ResponseEntity<String> unlikeReply(@RequestHeader("Authorization") String authorizationHeader, @PathVariable("reply_id") Long replyId) {
+    public ResponseEntity<String> unlikeReply(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("replyId") Long replyId) {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try {

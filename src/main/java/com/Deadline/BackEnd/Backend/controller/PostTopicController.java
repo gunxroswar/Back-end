@@ -1,7 +1,6 @@
 package com.Deadline.BackEnd.Backend.controller;
 
 import com.Deadline.BackEnd.Backend.Dto.ShowPostDto;
-import com.Deadline.BackEnd.Backend.exception.PostNotFoundExcetion;
 import com.Deadline.BackEnd.Backend.model.Post;
 import com.Deadline.BackEnd.Backend.repository.PostRepository;
 import com.Deadline.BackEnd.Backend.repository.StatusRepository;

@@ -2,7 +2,7 @@ package com.Deadline.BackEnd.Backend.controller;
 
 import com.Deadline.BackEnd.Backend.Dto.BookMarkDto;
 
-import com.Deadline.BackEnd.Backend.exception.PostNotFoundExcetion;
+import com.Deadline.BackEnd.Backend.exception.PostNotFoundException;
 import com.Deadline.BackEnd.Backend.model.Post;
 import com.Deadline.BackEnd.Backend.model.User;
 import com.Deadline.BackEnd.Backend.repository.PostRepository;
@@ -76,7 +76,7 @@ public class BookmarkController {
         User user = userRepository.findById(bookMarkDto.uid).orElseThrow(
                 () -> new UsernameNotFoundException(bookMarkDto.uid.toString()));
         Post post = postRepository.findById(bookMarkDto.postId).orElseThrow(
-                () -> new PostNotFoundExcetion(bookMarkDto.postId));
+                () -> new PostNotFoundException(bookMarkDto.postId));
         Set<Post> userBookmarkPosts = user.getBookmarkPosts();
         Set<User> userThatBookmark = post.getUserBookmarks();
 
