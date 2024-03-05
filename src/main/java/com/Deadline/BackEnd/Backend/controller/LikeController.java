@@ -1,12 +1,7 @@
 package com.Deadline.BackEnd.Backend.controller;
-
 import com.Deadline.BackEnd.Backend.exception.CommentNotFoundException;
-import com.Deadline.BackEnd.Backend.exception.CommentNotFoundExcetion;
 import com.Deadline.BackEnd.Backend.exception.PostNotFoundException;
-import com.Deadline.BackEnd.Backend.exception.PostNotFoundExcetion;
 import com.Deadline.BackEnd.Backend.exception.ReplyNotFoundException;
-import com.Deadline.BackEnd.Backend.exception.ReplyNotFoundExcetion;
-import com.Deadline.BackEnd.Backend.exception.UerNotFoundExcetion;
 import com.Deadline.BackEnd.Backend.exception.UserNotFoundException;
 import com.Deadline.BackEnd.Backend.model.Comment;
 import com.Deadline.BackEnd.Backend.model.Post;
