@@ -37,36 +37,36 @@ public class BookmarkController {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-        @PostMapping("/bookmark")
-    public ResponseEntity<String> getBookmark(@RequestBody GetBookMarkDto getBookMarkDto/*,
-                                          @RequestHeader(HttpHeaders.AUTHORIZATION) String AUTHORIZATION*/){
-
-        try {
-            //        System.out.println(AUTHORIZATION);
-            //        String UID = jwtService.extractUID(AUTHORIZATION);
-            //User user = userRepository.findByUid(Long.parseLong(UID));
-            User user = userRepository.findByUid(getBookMarkDto.uid);
-
-            Post post = postRepository.findByPostId(getBookMarkDto.postId);
-            Set<Post> userBookmarkPosts = user.getBookmarkPosts();
-            Set<User> userThatBookmark = post.getUserBookmarks();
-
-            userBookmarkPosts.add(post);
-            user.setBookmarkPosts(userBookmarkPosts);
-            userRepository.save(user);
-
-            userThatBookmark.add(user);
-            post.setUserBookmarks(userThatBookmark);
-            postRepository.save(post);
-
-            return ResponseEntity.ok("Bookmark complete");
-        } catch (Exception e) {
-            // You can handle the exception as per your application's requirement.
-            // For example, logging the error or returning an appropriate response to the client.
-            e.printStackTrace(); // For logging purposes
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to bookmark due to an internal error.");
-        }
-    }
+//        @PostMapping("/bookmark")
+//    public ResponseEntity<String> getBookmark(@RequestBody GetBookMarkDto getBookMarkDto/*,
+//                                          @RequestHeader(HttpHeaders.AUTHORIZATION) String AUTHORIZATION*/){
+//
+//        try {
+//            //        System.out.println(AUTHORIZATION);
+//            //        String UID = jwtService.extractUID(AUTHORIZATION);
+//            //User user = userRepository.findByUid(Long.parseLong(UID));
+//            User user = userRepository.findByUid(getBookMarkDto.uid);
+//
+//            Post post = postRepository.findByPostId(getBookMarkDto.postId);
+//            Set<Post> userBookmarkPosts = user.getBookmarkPosts();
+//            Set<User> userThatBookmark = post.getUserBookmarks();
+//
+//            userBookmarkPosts.add(post);
+//            user.setBookmarkPosts(userBookmarkPosts);
+//            userRepository.save(user);
+//
+//            userThatBookmark.add(user);
+//            post.setUserBookmarks(userThatBookmark);
+//            postRepository.save(post);
+//
+//            return ResponseEntity.ok("Bookmark complete");
+//        } catch (Exception e) {
+//            // You can handle the exception as per your application's requirement.
+//            // For example, logging the error or returning an appropriate response to the client.
+//            e.printStackTrace(); // For logging purposes
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to bookmark due to an internal error.");
+//        }
+//    }
 
     @PostMapping("/testbookmark")
     public ResponseEntity<String> testBookmark(@RequestBody @NotNull GetBookMarkDto getBookMarkDto) {
