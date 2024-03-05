@@ -9,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -71,5 +72,5 @@ public class Reply {
             joinColumns = @JoinColumn(name = "replyId"),
             inverseJoinColumns = @JoinColumn(name = "userId")
     )
-    private Set<User> userLikeReply;
+    private Set<User> userLikeReply = new HashSet<>();
 }
