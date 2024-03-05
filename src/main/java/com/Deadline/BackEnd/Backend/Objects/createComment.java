@@ -1,10 +1,15 @@
 package com.Deadline.BackEnd.Backend.Objects;
 
-import java.math.BigInteger;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
+@Data
 public class createComment {
-    public BigInteger PostID;
-    public String detail;
-    public String cookie;
-
+    private String postID;
+    private String topic;
+    private String detail;
+    private String cookie;
 }
