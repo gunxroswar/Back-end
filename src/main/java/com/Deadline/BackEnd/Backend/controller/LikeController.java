@@ -1,9 +1,13 @@
 package com.Deadline.BackEnd.Backend.controller;
 
+import com.Deadline.BackEnd.Backend.exception.CommentNotFoundException;
 import com.Deadline.BackEnd.Backend.exception.CommentNotFoundExcetion;
+import com.Deadline.BackEnd.Backend.exception.PostNotFoundException;
 import com.Deadline.BackEnd.Backend.exception.PostNotFoundExcetion;
+import com.Deadline.BackEnd.Backend.exception.ReplyNotFoundException;
 import com.Deadline.BackEnd.Backend.exception.ReplyNotFoundExcetion;
 import com.Deadline.BackEnd.Backend.exception.UerNotFoundExcetion;
+import com.Deadline.BackEnd.Backend.exception.UserNotFoundException;
 import com.Deadline.BackEnd.Backend.model.Comment;
 import com.Deadline.BackEnd.Backend.model.Post;
 import com.Deadline.BackEnd.Backend.model.Reply;
@@ -45,8 +49,8 @@ public class LikeController {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try {
-            Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundExcetion(postId));
-            User user = userRepository.findById(uid).orElseThrow(()->new UerNotFoundExcetion(uid));
+            Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
+            User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= post.getUserLikePost();
             likeSet.add(user);
             post.setUserLikePost(likeSet);
@@ -54,7 +58,7 @@ public class LikeController {
             postRepository.save(post);
             return new ResponseEntity<>("Post with ID " + postId + " is liked", HttpStatus.OK);
 
-        } catch (PostNotFoundExcetion | UerNotFoundExcetion e  ) {
+        } catch (PostNotFoundException|UserNotFoundException e  ) {
             return new ResponseEntity<String>(e.toString(), HttpStatus.NOT_FOUND);
         }
     }
@@ -63,8 +67,8 @@ public class LikeController {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try {
-            Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundExcetion(postId));
-            User user = userRepository.findById(uid).orElseThrow(()->new UerNotFoundExcetion(uid));
+            Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
+            User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= post.getUserLikePost();
             likeSet.remove(user);
             post.setUserLikePost(likeSet);
@@ -72,7 +76,7 @@ public class LikeController {
             postRepository.save(post);
             return new ResponseEntity<>("Post with ID " + postId + " is unliked", HttpStatus.OK);
 
-        } catch (PostNotFoundExcetion | UerNotFoundExcetion e  ) {
+        } catch (PostNotFoundException|UserNotFoundException e  ) {
             return new ResponseEntity<String>(e.toString(), HttpStatus.NOT_FOUND);
         }
     }
@@ -82,8 +86,8 @@ public class LikeController {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try {
-            Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundExcetion(commentId));
-            User user = userRepository.findById(uid).orElseThrow(()->new UerNotFoundExcetion(uid));
+            Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
+            User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= comment.getUserLikeComment();
             likeSet.add(user);
             comment.setUserLikeComment(likeSet);
@@ -91,7 +95,7 @@ public class LikeController {
             commentRepository.save(comment);
             return new ResponseEntity<>("Comment with ID " + commentId + " is liked", HttpStatus.OK);
 
-        } catch (CommentNotFoundExcetion | UerNotFoundExcetion e  ) {
+        } catch (CommentNotFoundException | UserNotFoundException e  ) {
             return new ResponseEntity<String>(e.toString(), HttpStatus.NOT_FOUND);
         }
     }
@@ -101,8 +105,8 @@ public class LikeController {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try {
-            Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundExcetion(commentId));
-            User user = userRepository.findById(uid).orElseThrow(()->new UerNotFoundExcetion(uid));
+            Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
+            User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= comment.getUserLikeComment();
             likeSet.remove(user);
             comment.setUserLikeComment(likeSet);
@@ -110,7 +114,7 @@ public class LikeController {
             commentRepository.save(comment);
             return new ResponseEntity<>("Comment with ID " + commentId + " is liked", HttpStatus.OK);
 
-        } catch (CommentNotFoundExcetion | UerNotFoundExcetion e  ) {
+        } catch (CommentNotFoundException | UserNotFoundException e  ) {
             return new ResponseEntity<String>(e.toString(), HttpStatus.NOT_FOUND);
         }
     }
@@ -120,8 +124,8 @@ public class LikeController {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try {
-            Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new ReplyNotFoundExcetion(replyId));
-            User user = userRepository.findById(uid).orElseThrow(()->new UerNotFoundExcetion(uid));
+            Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new ReplyNotFoundException(replyId));
+            User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= reply.getUserLikeReply();
             likeSet.add(user);
             reply.setUserLikeReply(likeSet);
@@ -129,7 +133,7 @@ public class LikeController {
             replyRepository.save(reply);
             return new ResponseEntity<>("Reply with ID " + replyId + " is liked", HttpStatus.OK);
 
-        } catch (ReplyNotFoundExcetion | UerNotFoundExcetion e  ) {
+        } catch (ReplyNotFoundException | UserNotFoundException e  ) {
             return new ResponseEntity<String>(e.toString(), HttpStatus.NOT_FOUND);
         }
     }
@@ -139,8 +143,8 @@ public class LikeController {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try {
-            Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new ReplyNotFoundExcetion(replyId));
-            User user = userRepository.findById(uid).orElseThrow(()->new UerNotFoundExcetion(uid));
+            Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new ReplyNotFoundException(replyId));
+            User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= reply.getUserLikeReply();
             likeSet.remove(user);
             reply.setUserLikeReply(likeSet);
@@ -148,7 +152,7 @@ public class LikeController {
             replyRepository.save(reply);
             return new ResponseEntity<>("Reply with ID " + replyId + " is unliked", HttpStatus.OK);
 
-        } catch (ReplyNotFoundExcetion | UerNotFoundExcetion e  ) {
+        } catch (ReplyNotFoundException | UserNotFoundException e  ) {
             return new ResponseEntity<String>(e.toString(), HttpStatus.NOT_FOUND);
         }
     }
