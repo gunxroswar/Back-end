@@ -5,7 +5,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 public class CommentNotFoundExcetion extends RuntimeException{
-    public CommentNotFoundExcetion(Long commentId) {
+    public CommentNotFoundExcetion(long commentId) {
         super("Comment not found with "+commentId);
     }
+
+
 }

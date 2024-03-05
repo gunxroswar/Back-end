@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment,Long> {
@@ -19,4 +20,6 @@ public interface CommentRepository extends JpaRepository<Comment,Long> {
      @Query("SELECT coalesce(max(commentId), 0) FROM Comment")
      Long findMaxId();
      Long countByPost(Post post);
+
+     Optional<Comment> findById(String commentId);
 }
