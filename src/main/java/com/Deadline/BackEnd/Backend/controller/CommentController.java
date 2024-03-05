@@ -90,7 +90,7 @@ public class CommentController {
         Post post = postRepository.findById(Long.parseLong(info.getPostID())).get();
         User user = null;
         List<Reply> replyBodies = new LinkedList<>();
-        String topic = info.getTopic();
+
         String detail = info.getDetail();
         Long likeCount = 0L;
         Boolean anonymous = false;
@@ -104,7 +104,6 @@ public class CommentController {
         newComment.setPost(post);
         newComment.setUser(user);
         newComment.setReplyBodies(replyBodies);
-        newComment.setTopic(topic);
         newComment.setDetail(detail);
         newComment.setLikeCount(likeCount);
         newComment.setAnonymous(anonymous);
@@ -123,10 +122,8 @@ public class CommentController {
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> editComment(@RequestBody editComment info){
         Comment editComment = commentRepository.findById(Long.getLong(info.getCommentID())).get();
-        String topic = info.getTopic();
         String detail = info.getDetail();
 
-        editComment.setTopic(topic);
         editComment.setDetail(detail);
 
         commentRepository.save(editComment);

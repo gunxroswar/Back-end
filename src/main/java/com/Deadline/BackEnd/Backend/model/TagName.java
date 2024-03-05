@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -25,6 +26,6 @@ public class TagName {
             joinColumns = @JoinColumn(name = "tagId"),
             inverseJoinColumns = @JoinColumn(name = "postId")
     )
-    private Set<Post> postWithTags;
+    private Set<Post> postWithTags = new HashSet<>();
 }
 

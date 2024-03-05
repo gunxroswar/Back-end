@@ -41,10 +41,10 @@ public class Comment {
     @OneToMany(mappedBy = "comment")
     private List<Reply> replyBodies;
 
-    @NotBlank(message = "topic must not be Blank")
-    @Size(max = 512,message = "topic is at most 512 characters.")
-    @Column(nullable = false,length = 512)
-    private String topic;
+//    @NotBlank(message = "topic must not be Blank")
+//    @Size(max = 512,message = "topic is at most 512 characters.")
+//    @Column(nullable = false,length = 512)
+//    private String topic;
 
     @NotBlank(message = "detail must not be Blank")
     @Size(max = 512,message = "topic is at most 4096 characters.")

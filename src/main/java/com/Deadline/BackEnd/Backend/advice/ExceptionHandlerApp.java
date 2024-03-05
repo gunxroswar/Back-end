@@ -1,6 +1,5 @@
 package com.Deadline.BackEnd.Backend.advice;
 
-import com.Deadline.BackEnd.Backend.exception.PostNotFoundExcetion;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;

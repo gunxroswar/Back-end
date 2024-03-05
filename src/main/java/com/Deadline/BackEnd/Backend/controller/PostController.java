@@ -1,9 +1,8 @@
 package com.Deadline.BackEnd.Backend.controller;
 
 import com.Deadline.BackEnd.Backend.Objects.createPost;
-import com.Deadline.BackEnd.Backend.Objects.editComment;
 import com.Deadline.BackEnd.Backend.Objects.editPost;
-import com.Deadline.BackEnd.Backend.exception.PostNotFoundExcetion;
+import com.Deadline.BackEnd.Backend.exception.PostNotFoundException;
 import com.Deadline.BackEnd.Backend.model.*;
 import com.Deadline.BackEnd.Backend.repository.CommentRepository;
 import com.Deadline.BackEnd.Backend.repository.PostRepository;
@@ -13,9 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigInteger;
-import java.sql.ResultSet;
-import java.sql.Timestamp;
 import java.util.*;
 
 @RestController
@@ -71,7 +67,7 @@ public class PostController {
     public ResponseEntity<String> editPost(@RequestBody editPost info){
         Long editpostId= Long.getLong(info.getPostID());
         Optional<Post> postOpt= postRepository.findById(editpostId);
-        Post editPost =postOpt.orElseThrow(() -> new PostNotFoundExcetion(editpostId));
+        Post editPost =postOpt.orElseThrow(() -> new PostNotFoundException(editpostId));
 //        Post editPost = postRepository.findById(Long.getLong(info.getPostID())).get();
         String topic = info.getTopic();
         String tag = info.getTag();

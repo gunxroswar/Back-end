@@ -7,7 +7,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Data
-public class createComment {
-    private String postID;
+public class createReply {
+    private String commentID;
+    private String topic;
     private String detail;
+    private String cookie;
 }
