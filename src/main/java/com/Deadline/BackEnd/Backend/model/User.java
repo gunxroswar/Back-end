@@ -56,13 +56,13 @@ public class User implements UserDetails {
     private Set<Post> posts;
 
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "bookmark",
             joinColumns = @JoinColumn(name = "userId"),
             inverseJoinColumns = @JoinColumn(name = "postId")
     )
-    private Set<Post> bookmarkPosts;
+    private Set<Post> bookmarkPosts ;
 
 
     @Override
@@ -88,6 +88,16 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return false;
+    }
+
+    public void removeBookmark(Post post){
+        this.bookmarkPosts.remove(post);
+        post.getUserBookmarks().remove(this);
+    }
+
+    public void addBookmark(Post post){
+        this.bookmarkPosts.add(post);
+        post.getUserBookmarks().add(this);
     }
 }
 

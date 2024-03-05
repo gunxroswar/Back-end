@@ -70,7 +70,7 @@ public class Post {
     private Date updateAt;
 
     @ManyToMany(mappedBy = "bookmarkPosts")
-    private Set<User> userBookmarks;
+    private Set<User> userBookmarks ;
 
     @ManyToMany(mappedBy = "postWithTags")
     private Set<TagName> tagNames = new HashSet<>();
@@ -83,5 +83,14 @@ public class Post {
     )
     private Set<User> userLikePost;
 
+    public void removeUserBookmark(User user){
+        this.userBookmarks.remove(user);
+        user.getBookmarkPosts().remove(this);
+    }
+
+    public void addBookmark(User user){
+        this.userBookmarks.add(user);
+        user.getBookmarkPosts().add(this);
+    }
 
 }
