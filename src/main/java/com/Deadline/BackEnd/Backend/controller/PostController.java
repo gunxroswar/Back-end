@@ -3,10 +3,13 @@ package com.Deadline.BackEnd.Backend.controller;
 import com.Deadline.BackEnd.Backend.Objects.createPost;
 import com.Deadline.BackEnd.Backend.Objects.editPost;
 import com.Deadline.BackEnd.Backend.exception.PostNotFoundException;
+import com.Deadline.BackEnd.Backend.exception.UserNotFoundException;
 import com.Deadline.BackEnd.Backend.model.*;
 import com.Deadline.BackEnd.Backend.repository.CommentRepository;
 import com.Deadline.BackEnd.Backend.repository.PostRepository;
+import com.Deadline.BackEnd.Backend.repository.TagRepository;
 import com.Deadline.BackEnd.Backend.repository.UserRepository;
+import com.Deadline.BackEnd.Backend.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,46 @@ public class PostController {
     private CommentRepository commentRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private TagRepository tagRepository;
+    private JwtService jwt = new JwtService();
+
+    private Set<TagName> readTag(String inputString){
+        List<String> infoTags = new LinkedList<>();
+        StringBuilder tagReader = new StringBuilder();
+        Character currentChar;
+        for(int i = 1; i < inputString.length()-1; i++){
+            currentChar = inputString.charAt(i);
+            if(currentChar == ','){
+                infoTags.add(tagReader.toString());
+                tagReader.setLength(0);
+                continue;
+            }
+            tagReader.append(currentChar);
+        }
+        if(!tagReader.isEmpty()) infoTags.add(tagReader.toString());
+
+        Set<TagName> tagNames = new HashSet<>();
+        Optional<TagName> tagname = null;
+        for(int i = 0; i < infoTags.size(); i++){
+            tagname = tagRepository.findByTagName(infoTags.get(i));
+            if(!tagname.isEmpty()) tagNames.add(tagname.get());
+        }
+
+        return tagNames;
+    }
+
+    private String tagSetToJSONTag(Set<TagName> tagNames){
+        if(tagNames.isEmpty()) return "{}";
+        StringBuilder JSONTag = new StringBuilder("{");
+        for(TagName tag : tagNames){
+            JSONTag.append(tag.getTagName() + ",");
+        }
+        JSONTag.deleteCharAt(JSONTag.length()-1);
+        JSONTag.append("}");
+
+        return JSONTag.toString();
+    }
 
     @PostMapping("/posts/create")
     @CrossOrigin(origins = "http://localhost:3000")
@@ -31,6 +74,7 @@ public class PostController {
         User user = null;
         List<Comment> commentList = new LinkedList<>();
         String topic = info.getTopic();
+        Set<TagName> tagNames = readTag(info.getTag());
         String detail = info.getDetail();
         Long likeCount = 0L;
         Boolean anonymous = false;
@@ -39,7 +83,6 @@ public class PostController {
         Date createAt = new Date();
         Date updateAt = createAt;
         Set<User> userBookmarks = new HashSet<>();
-        Set<TagName> tagNames = new HashSet<>();
         Set<User> userLikePost = new HashSet<>();
 
         newPost.setPostId(postId);
@@ -54,10 +97,12 @@ public class PostController {
         newPost.setCreateAt(createAt);
         newPost.setUpdateAt(updateAt);
         newPost.setUserBookmarks(userBookmarks);
-        newPost.setTagNames(tagNames);
         newPost.setUserLikePost(userLikePost);
 
         postRepository.save(newPost);
+
+        for(TagName tag : tagNames) tag.getPostWithTags().add(newPost);
+        tagRepository.saveAll(tagNames);
 
         return new ResponseEntity<>("OK", HttpStatus.CREATED);
     }
@@ -70,31 +115,43 @@ public class PostController {
         Post editPost =postOpt.orElseThrow(() -> new PostNotFoundException(editpostId));
 //        Post editPost = postRepository.findById(Long.getLong(info.getPostID())).get();
         String topic = info.getTopic();
-        String tag = info.getTag();
+        Set<TagName> tagNames = readTag(info.getTag());
         String detail = info.getDetail();
 
         editPost.setTopic(topic);
+        editPost.setTagNames(tagNames);
         editPost.setDetail(detail);
 
         postRepository.save(editPost);
+        tagRepository.saveAll(tagNames);
 
         return new ResponseEntity<>("OK", HttpStatus.CREATED);
     }
 
     @GetMapping("/posts")
     @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<String> getPost(@RequestParam("postId") Long id){
+    public ResponseEntity<String> getPost(@RequestParam("postId") Long id ,@RequestHeader(value = "Authorization", required = false) String authorizationHeader){
+        String bearerToken = authorizationHeader.replace("Bearer ", "");
+        User user;
+        try {
+            String u = jwt.extractUID(bearerToken);
+            user= userRepository.findById(Long.parseLong(u)).orElseThrow(()-> new UserNotFoundException(Long.parseLong(u)));
+        } catch (Exception e){}
+
+
         Optional<Post> search = postRepository.findById(id);
         StringBuilder sendBack = new StringBuilder();
         if(search.isEmpty()) sendBack.append("[]");
         //"topic, detail , create_at, like_count, '[]' as taglist"
         else{
             sendBack.append("{");
-            sendBack.append("\"topic\":\"").append(search.get().getTopic()).append("\",");
-            sendBack.append("\"detail\":\"").append(search.get().getDetail()).append("\",");
-            sendBack.append("\"create_at\":\"").append(search.get().getCreateAt()).append("\",");
-            sendBack.append("\"like_count\":\"").append(search.get().getLikeCount()).append("\",");
-            sendBack.append("\"taglist\":\"").append(search.get().getTagNames()).append("\"");
+            Post currentPost = search.get();
+            sendBack.append("\"topic\":\"").append(currentPost.getTopic()).append("\",");
+            sendBack.append("\"detail\":\"").append(currentPost.getDetail()).append("\",");
+            sendBack.append("\"create_at\":\"").append(currentPost.getCreateAt()).append("\",");
+            sendBack.append("\"like_count\":\"").append(currentPost.getLikeCount()).append("\",");
+            Set<TagName> tagName = tagRepository.findByPostWithTags(currentPost);
+            sendBack.append("\"taglist\":\"").append(tagSetToJSONTag(tagName)).append("\"");
             sendBack.append("}");
         }
 
@@ -120,7 +177,8 @@ public class PostController {
             subSendBack.append("\"create_at\":\"").append(currentPost.getCreateAt()).append("\",");
             subSendBack.append("\"like_count\":\"").append(currentPost.getLikeCount()).append("\",");
             subSendBack.append("\"has_verify\":\"").append(currentPost.getHasVerify()).append("\",");
-            subSendBack.append("\"taglist\":\"").append(currentPost.getTagNames()).append("\",");
+            Set<TagName> tagName = tagRepository.findByPostWithTags(currentPost);
+            sendBack.append("\"taglist\":\"").append(tagSetToJSONTag(tagName)).append("\"");
             subSendBack.append("\"commentCount\":\"").append(commentCount.toString()).append("\"");
             subSendBack.append("},");
             sendBack.append(subSendBack);
