@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestToken {
     public JwtService jwt = new JwtService();
     @GetMapping("/v1/test/token")
-    public String yourEndpoint(@RequestHeader("Authorization") String authorizationHeader) {
+    public String yourEndpoint(@RequestHeader("Authorization") String authorizationHeader  ) {
         // Extract the bearer token from the Authorization header
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         String u=jwt.extractUID(bearerToken);
