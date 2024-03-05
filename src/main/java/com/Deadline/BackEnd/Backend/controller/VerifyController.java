@@ -35,12 +35,12 @@ public class VerifyController {
     @PutMapping ("/comments/verify")
     public ResponseEntity<String> verifyComment(@RequestHeader("Authorization") String authorizationHeader,@PathVariable("comment_id") long commentId) {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
-        String uid_string=jwt.extractUID(bearerToken);
+        Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try{
             Optional<Comment> commentOpt= commentRepository.findById(commentId);
             Comment comment =commentOpt.orElseThrow(() -> new CommentNotFoundExcetion(commentId));
             Post post= comment.getPost();
-            if(post.getUser().getUid().equals(Long.parseLong(uid_string))   ){
+            if(post.getUser().getUid().equals(uid)   ){
                 comment.setIsVerify(true);
                 post.setHasVerify(true);
                 postRepository.save(post);
@@ -62,12 +62,12 @@ public class VerifyController {
     @PutMapping ("/comments/unverify")
     public ResponseEntity<String> unverifyComment(@RequestHeader("Authorization") String authorizationHeader,@PathVariable("comment_id") long commentId) {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
-        String uid_string=jwt.extractUID(bearerToken);
+        Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try{
             Optional<Comment> commentOpt= commentRepository.findById(commentId);
             Comment comment =commentOpt.orElseThrow(() -> new CommentNotFoundExcetion(commentId));
             Post post= comment.getPost();
-            if(post.getUser().getUid().equals(Long.parseLong(uid_string))  ){
+            if(post.getUser().getUid().equals(uid)  ){
                 comment.setIsVerify(false);
                 boolean hasVerify = false;
                 for (Comment commentInPost : commentRepository.findByPost(post)) {
