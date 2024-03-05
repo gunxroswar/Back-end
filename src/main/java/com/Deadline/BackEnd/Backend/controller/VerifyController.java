@@ -1,8 +1,8 @@
 package com.Deadline.BackEnd.Backend.controller;
 
-import com.Deadline.BackEnd.Backend.exception.CommentNotFoundExcetion;
-import com.Deadline.BackEnd.Backend.exception.PostNotFoundExcetion;
-import com.Deadline.BackEnd.Backend.exception.UerNotFoundExcetion;
+import com.Deadline.BackEnd.Backend.exception.CommentNotFoundException;
+import com.Deadline.BackEnd.Backend.exception.PostNotFoundException;
+import com.Deadline.BackEnd.Backend.exception.UserNotFoundException;
 import com.Deadline.BackEnd.Backend.model.Comment;
 import com.Deadline.BackEnd.Backend.model.Post;
 import com.Deadline.BackEnd.Backend.repository.CommentRepository;
@@ -38,7 +38,7 @@ public class VerifyController {
         String uid_string=jwt.extractUID(bearerToken);
         try{
             Optional<Comment> commentOpt= commentRepository.findById(commentId);
-            Comment comment =commentOpt.orElseThrow(() -> new CommentNotFoundExcetion(commentId));
+            Comment comment =commentOpt.orElseThrow(() -> new CommentNotFoundException(commentId));
             Post post= comment.getPost();
             if(post.getUser().getUid().equals(Long.parseLong(uid_string))   ){
                 comment.setIsVerify(true);
@@ -52,7 +52,7 @@ public class VerifyController {
                 return new ResponseEntity<String>("User don't own post "+ post.getPostId(), HttpStatus.FORBIDDEN);
             }
 
-        }catch (CommentNotFoundExcetion e) {
+        }catch (CommentNotFoundException e) {
             return new ResponseEntity<String>(e.toString(),HttpStatus.NOT_FOUND);
         }
 
@@ -65,7 +65,7 @@ public class VerifyController {
         String uid_string=jwt.extractUID(bearerToken);
         try{
             Optional<Comment> commentOpt= commentRepository.findById(commentId);
-            Comment comment =commentOpt.orElseThrow(() -> new CommentNotFoundExcetion(commentId));
+            Comment comment =commentOpt.orElseThrow(() -> new CommentNotFoundException(commentId));
             Post post= comment.getPost();
             if(post.getUser().getUid().equals(Long.parseLong(uid_string))  ){
                 comment.setIsVerify(false);
@@ -85,7 +85,7 @@ public class VerifyController {
             else {
                 return new ResponseEntity<String>("User don't own post "+ post.getPostId(), HttpStatus.FORBIDDEN);
             }
-        }catch (CommentNotFoundExcetion e) {
+        }catch (CommentNotFoundException e) {
             return new ResponseEntity<String>(e.toString(),HttpStatus.NOT_FOUND);
         }
 
