@@ -117,7 +117,7 @@ public class BookmarkController {
         if (deletedRows > 0) {
             return ResponseEntity.ok("Bookmark removed successfully, uid = " + uid + " postId = " + bookMarkDto.postId);
         } else {
-            return ResponseEntity.ok("Bookmark not found, uid = " + uid + " postId = " + bookMarkDto.postId);
+            return ResponseEntity.badRequest().body("Bookmark not found, uid = " + uid + " postId = " + bookMarkDto.postId);
         }
     }
 
