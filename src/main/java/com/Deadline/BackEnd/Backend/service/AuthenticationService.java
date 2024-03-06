@@ -72,22 +72,25 @@ private final AuthenticationManager authenticationManager;
         Boolean profileName= repository.findByProfileName(request.getProfileName()).isEmpty();
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         String uId=jwt.extractUID(bearerToken);
-        Optional<User> userOpt = repository.findById(Long.parseLong(uId));
-        User user =userOpt.orElseThrow(()->new UserNotFoundException(Long.parseLong(uId)));
-        user.setUsername(request.getUsername());
-        user.setProfileName(request.getProfileName());
+
         try{
-            if(request.getPassword().length()<8){
-                password = false;
-            }
-            if(username && profileName && password){
-                sha256hex = Hashing.sha256()
-                        .hashString(SALT+request.getPassword(), StandardCharsets.UTF_8)
-                        .toString();
-                user.setPassword(sha256hex);
-//                user.setRole(1);
-                user = repository.save(user);
-            }else throw new RuntimeException();
+            if(uId != null){
+                Optional<User> userOpt = repository.findById(Long.parseLong(uId));
+                User user =userOpt.orElseThrow(()->new UserNotFoundException(Long.parseLong(uId)));
+                user.setUsername(request.getUsername());
+                user.setProfileName(request.getProfileName());
+                if(request.getPassword().length()<8){
+                    password = false;
+                }
+                if(username && profileName && password){
+                    sha256hex = Hashing.sha256()
+                            .hashString(SALT+request.getPassword(), StandardCharsets.UTF_8)
+                            .toString();
+                    user.setPassword(sha256hex);
+                    user = repository.save(user);
+                }else throw new RuntimeException();
+            }else return new ResponseEntity<String>("Token is expired.", HttpStatus.UNAUTHORIZED);
+
         }catch (Exception e){
             return ResponseEntity.badRequest().body("{\"username\": \""+username+"\"," +
                     " \"usernameDetail\": "+ (username?"\"OK\"":"\"Username is duplicated.\"") +"," +
