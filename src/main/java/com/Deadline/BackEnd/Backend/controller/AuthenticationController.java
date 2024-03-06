@@ -51,7 +51,6 @@ public class AuthenticationController {
     }
     @GetMapping("/v1/guests/isAuth")
     public ResponseEntity<String> isAuth(@RequestHeader("Authorization") String authorizationHeader){
-        System.err.println("qqqqq");
         String profileName = "";
         try {
             String bearerToken = authorizationHeader.replace("Bearer ", "");

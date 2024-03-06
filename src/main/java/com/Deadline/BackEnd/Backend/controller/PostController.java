@@ -91,7 +91,9 @@ public class PostController {
         // Is inputUser like inputPost
         boolean isLike = false;
         Set<User> userLikePost = inputPost.getUserLikePost();
-        if(inputUser != null) isLike = userLikePost.contains(inputUser);
+        if(inputUser != null) {isLike = userLikePost.contains(inputUser);
+//            System.out.println(inputPost.getPostId()+ " "+inputUser.getUid() + " = "+ isLike);
+        }
         // Get all tagName of inputPost
         Set<TagName> tagName = tagRepository.findByPostWithTags(inputPost);
         // Count comment of inputPost
@@ -206,9 +208,13 @@ public class PostController {
     public ResponseEntity<String> getPost(@RequestParam("postId") Long id, @RequestHeader(value = "Authorization") String authorizationHeader){
         User user = getUserFromAuthHeader(authorizationHeader);
         Optional<Post> postOpt = postRepository.findById(id);
+//        System.out.println(postOpt.get());
+        Post temp = postOpt.orElse(null);
         StringBuilder sendBack = new StringBuilder();
-        if(postOpt.isEmpty()) sendBack.append("[]");
-        else sendBack.append(postJSONBuilder(postOpt.get(), user));
+        if(temp==null) sendBack.append("[]");
+        else sendBack.append(postJSONBuilder(temp, user));
+//        if(postOpt.isEmpty()) sendBack.append("[]");
+//        else sendBack.append(postJSONBuilder(postOpt.get(), user));
 
         return new ResponseEntity<>(sendBack.toString(), HttpStatus.OK);
     }
