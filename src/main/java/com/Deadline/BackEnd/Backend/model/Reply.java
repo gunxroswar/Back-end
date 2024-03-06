@@ -66,7 +66,7 @@ public class Reply {
     @UpdateTimestamp
     @Column(name = "UpdateAt")
     private Date updateAt;
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "like_reply",
             joinColumns = @JoinColumn(name = "replyId"),

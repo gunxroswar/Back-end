@@ -9,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -70,12 +71,12 @@ public class Comment {
     @UpdateTimestamp
     @Column(name = "UpdateAt")
     private Date updateAt;
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "like_comment",
             joinColumns = @JoinColumn(name = "commentId"),
             inverseJoinColumns = @JoinColumn(name = "userId")
     )
-    private Set<User> userLikeComment;
+    private Set<User> userLikeComment=new HashSet<>();
 
 }
