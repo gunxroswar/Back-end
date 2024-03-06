@@ -2,12 +2,16 @@ package com.Deadline.BackEnd.Backend.controller;
 
 import com.Deadline.BackEnd.Backend.Objects.createComment;
 import com.Deadline.BackEnd.Backend.Objects.editComment;
+import com.Deadline.BackEnd.Backend.exception.CommentNotFoundException;
+import com.Deadline.BackEnd.Backend.exception.ReplyNotFoundException;
 import com.Deadline.BackEnd.Backend.model.*;
 import com.Deadline.BackEnd.Backend.repository.CommentRepository;
 import com.Deadline.BackEnd.Backend.repository.PostRepository;
 import com.Deadline.BackEnd.Backend.repository.ReplyRepository;
+import com.Deadline.BackEnd.Backend.service.JwtService;
 import org.checkerframework.checker.units.qual.C;
 import org.hibernate.dialect.SybaseASEDialect;
+import org.hibernate.tool.schema.spi.CommandAcceptanceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
@@ -28,6 +32,7 @@ public class CommentController {
     PostRepository postRepository;
     @Autowired
     ReplyRepository replyRepository;
+    public JwtService jwt = new JwtService();
 
     @GetMapping("/posts/{id}/comments")
     public ResponseEntity<List<Comment>> getCommentInPost(@PathVariable(name = "id") Long postId )
@@ -116,15 +121,47 @@ public class CommentController {
         return new ResponseEntity<>("OK", HttpStatus.CREATED);
     }
 
-    @PostMapping("/comments/edit")
-    public ResponseEntity<String> editComment(@RequestBody editComment info){
-        Comment editComment = commentRepository.findById(Long.getLong(info.getCommentID())).get();
-        String detail = info.getDetail();
+    @PutMapping("/comments")
+    public ResponseEntity<String> editComment(@RequestHeader("Authorization") String authorizationHeader,@RequestBody editComment info){
+        try
+        {
+            String bearerToken = authorizationHeader.replace("Bearer ", "");
+            Long uid = Long.parseLong(jwt.extractUID(bearerToken));
+            Comment editComment = commentRepository.findById(Long.getLong(info.getCommentID())).orElseThrow(()->new CommentNotFoundException(Long.getLong(info.getCommentID())));
+            if(editComment.getUser().getUid().equals(uid)  ){
+                String detail = info.getDetail();
 
-        editComment.setDetail(detail);
+                editComment.setDetail(detail);
 
-        commentRepository.save(editComment);
+                commentRepository.save(editComment);
 
-        return new ResponseEntity<>("OK", HttpStatus.CREATED);
+                return new ResponseEntity<>("edit comment successfully", HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<String>("User don't own comment "+ editComment.getCommentId(), HttpStatus.FORBIDDEN);
+            }
+        } catch (CommentNotFoundException e) {
+            return new ResponseEntity<String>(e.toString(),HttpStatus.NOT_FOUND);
+        }
+
+    }
+
+    @DeleteMapping("/comments")
+    public ResponseEntity<String> deleteComment(@RequestHeader("Authorization") String authorizationHeader,@RequestParam("commentId") Long commentId){
+        try {
+            String bearerToken = authorizationHeader.replace("Bearer ", "");
+            Long uid = Long.parseLong(jwt.extractUID(bearerToken));
+            Comment deleteComment = commentRepository.findById(commentId).orElseThrow(()->new CommentNotFoundException(commentId));
+            if(deleteComment.getUser().getUid().equals(uid)  ) {
+                commentRepository.deleteById(commentId);
+                return new ResponseEntity<>("delete comment successfully", HttpStatus.OK);
+            }
+            else{
+                return new ResponseEntity<String>("User don't own comment "+ deleteComment.getCommentId(), HttpStatus.FORBIDDEN);
+            }
+        }catch (CommentNotFoundException e)
+        {
+            return new ResponseEntity<String>(e.toString(),HttpStatus.NOT_FOUND);
+        }
     }
 }

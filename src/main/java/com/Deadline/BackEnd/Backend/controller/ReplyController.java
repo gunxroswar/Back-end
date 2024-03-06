@@ -2,6 +2,8 @@ package com.Deadline.BackEnd.Backend.controller;
 
 import com.Deadline.BackEnd.Backend.Objects.createReply;
 import com.Deadline.BackEnd.Backend.Objects.editReply;
+import com.Deadline.BackEnd.Backend.exception.CommentNotFoundException;
+import com.Deadline.BackEnd.Backend.exception.ReplyNotFoundException;
 import com.Deadline.BackEnd.Backend.model.Comment;
 import com.Deadline.BackEnd.Backend.model.PostStatus;
 import com.Deadline.BackEnd.Backend.model.Reply;
@@ -9,6 +11,7 @@ import com.Deadline.BackEnd.Backend.model.User;
 import com.Deadline.BackEnd.Backend.repository.CommentRepository;
 import com.Deadline.BackEnd.Backend.repository.ReplyRepository;
 import com.Deadline.BackEnd.Backend.repository.UserRepository;
+import com.Deadline.BackEnd.Backend.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +27,8 @@ public class ReplyController {
     CommentRepository commentRepository;
     @Autowired
     UserRepository userRepository;
+
+    public JwtService jwt = new JwtService();
 
     @GetMapping("/replys")
     public ResponseEntity<String> getReply(@RequestParam("replyId") Long id){
@@ -76,23 +81,49 @@ public class ReplyController {
         return new ResponseEntity<>("OK", HttpStatus.CREATED);
     }
 
-    @PostMapping("/replys/edit")
-    public ResponseEntity<String> editReply(@RequestBody editReply info){
-        Reply editReply = replyRepository.findById(Long.getLong(info.getReplyID())).get();
-        String topic = info.getTopic();
-        String detail = info.getDetail();
+    @PutMapping("/replys")
+    public ResponseEntity<String> editReply(@RequestHeader("Authorization") String authorizationHeader,@RequestBody editReply info){
+        try{
+            String bearerToken = authorizationHeader.replace("Bearer ", "");
+            Long uid = Long.parseLong(jwt.extractUID(bearerToken));
+            Reply editReply = replyRepository.findById(Long.getLong(info.getReplyID())).orElseThrow(()->new ReplyNotFoundException(Long.getLong(info.getReplyID())));
+            if(editReply.getUser().getUid().equals(uid)  ){
+                String topic = info.getTopic();
+                String detail = info.getDetail();
 
-        editReply.setTopic(topic);
-        editReply.setDetail(detail);
+                editReply.setTopic(topic);
+                editReply.setDetail(detail);
 
-        replyRepository.save(editReply);
+                replyRepository.save(editReply);
 
-        return new ResponseEntity<>("OK", HttpStatus.CREATED);
+                return new ResponseEntity<String>("edit reply successfully", HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<String>("User don't own reply "+ editReply.getReplyId(), HttpStatus.FORBIDDEN);
+            }
+        }catch (ReplyNotFoundException e)
+        {
+            return new ResponseEntity<String>(e.toString(),HttpStatus.NOT_FOUND);
+        }
+
     }
 
-    @GetMapping("/replys/delete")
-    public ResponseEntity<String> deleteReply(@RequestParam("replyId") Long id){
-        replyRepository.deleteById(id);
-        return new ResponseEntity<>("OK", HttpStatus.OK);
+    @DeleteMapping("/replys")
+    public ResponseEntity<String> deleteReply(@RequestHeader("Authorization") String authorizationHeader,@RequestParam("replyId") Long replyId){
+        try {
+            String bearerToken = authorizationHeader.replace("Bearer ", "");
+            Long uid = Long.parseLong(jwt.extractUID(bearerToken));
+            Reply deleteReply = replyRepository.findById(replyId).orElseThrow(()->new ReplyNotFoundException(replyId));
+            if(deleteReply.getUser().getUid().equals(uid)  ) {
+                replyRepository.deleteById(replyId);
+                return new ResponseEntity<>("delete reply successfully", HttpStatus.OK);
+            }
+            else{
+                return new ResponseEntity<String>("User don't own reply "+ deleteReply.getReplyId(), HttpStatus.FORBIDDEN);
+            }
+        }catch (ReplyNotFoundException e)
+        {
+            return new ResponseEntity<String>(e.toString(),HttpStatus.NOT_FOUND);
+        }
     }
 }
