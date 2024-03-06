@@ -26,14 +26,12 @@ public class AuthenticationController {
     }
 
     @PostMapping("/guests/signup")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> register(
             @RequestBody User request
             ){
         return authService.register(request);
     }
     @PostMapping("/guests/login")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<AuthenticationResponse> login(
             @RequestBody User request){
             return authService.authenticate(request);
@@ -46,12 +44,11 @@ public class AuthenticationController {
     }
 
     @PostMapping("/guests/edit")
-    @CrossOrigin(origins = "http://localhost:3000")
+//    
     public ResponseEntity<String> editProfile(@RequestBody User request,@RequestHeader("Authorization") String authorizationHeader ){
         return authService.editProfile(request,authorizationHeader);
     }
     @GetMapping("/v1/guests/isAuth")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> isAuth(@RequestHeader("Authorization") String authorizationHeader){
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         String u=jwt.extractUID(bearerToken);

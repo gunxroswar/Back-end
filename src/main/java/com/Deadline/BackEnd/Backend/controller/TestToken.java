@@ -15,7 +15,6 @@ public class TestToken {
         String u=jwt.extractUID(bearerToken);
         // Now you can use the bearerToken as needed
         // ...
-
         return "Token received successfully : "+bearerToken +"\n" + u;
     }
 }

@@ -59,7 +59,6 @@ public class CommentController {
     }
 
     @GetMapping("/comments")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> getComment(@RequestParam("commentId") Long id){
         Optional<Comment> search = commentRepository.findById(id);
         StringBuilder sendBack = new StringBuilder();
@@ -83,7 +82,6 @@ public class CommentController {
     }
 
     @PostMapping("/comments/create")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> createComment(@RequestBody createComment info){
         Comment newComment = new Comment();
         Long commentId = commentRepository.findMaxId()+1L;
@@ -119,7 +117,6 @@ public class CommentController {
     }
 
     @PostMapping("/comments/edit")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> editComment(@RequestBody editComment info){
         Comment editComment = commentRepository.findById(Long.getLong(info.getCommentID())).get();
         String detail = info.getDetail();

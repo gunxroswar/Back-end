@@ -26,7 +26,6 @@ public class ReplyController {
     UserRepository userRepository;
 
     @GetMapping("/replys")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> getReply(@RequestParam("replyId") Long id){
         Optional<Reply> replyOpt = replyRepository.findById(id);
         if(replyOpt.isEmpty()) return new ResponseEntity<>("[]", HttpStatus.NOT_FOUND);
@@ -46,7 +45,6 @@ public class ReplyController {
     }
 
     @PostMapping("/replys/create")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> createReply(@RequestBody createReply info){
         Reply newReply = new Reply();
         Long replyId = replyRepository.findMaxId()+1L;
@@ -79,7 +77,6 @@ public class ReplyController {
     }
 
     @PostMapping("/replys/edit")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> editReply(@RequestBody editReply info){
         Reply editReply = replyRepository.findById(Long.getLong(info.getReplyID())).get();
         String topic = info.getTopic();
@@ -94,7 +91,6 @@ public class ReplyController {
     }
 
     @GetMapping("/replys/delete")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> deleteReply(@RequestParam("replyId") Long id){
         replyRepository.deleteById(id);
         return new ResponseEntity<>("OK", HttpStatus.OK);
