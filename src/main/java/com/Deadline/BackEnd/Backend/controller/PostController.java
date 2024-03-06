@@ -138,7 +138,7 @@ public class PostController {
         try {
             String u = jwt.extractUID(bearerToken);
             user= userRepository.findById(Long.parseLong(u)).orElseThrow(()-> new UserNotFoundException(Long.parseLong(u)));
-        } catch (Exception e){}
+
 
 
         Optional<Post> search = postRepository.findById(id);
@@ -147,7 +147,7 @@ public class PostController {
         //"topic, detail , create_at, like_count, '[]' as taglist"
         else{
             sendBack.append("{");
-            Post currentPost = search.orElseThrow(()-> new PostNotFoundException(postId));
+            Post currentPost = search.orElseThrow(()-> new PostNotFoundException(id));
             sendBack.append("\"topic\":\"").append(currentPost.getTopic()).append("\",");
             sendBack.append("\"detail\":\"").append(currentPost.getDetail()).append("\",");
             sendBack.append("\"create_at\":\"").append(currentPost.getCreateAt()).append("\",");
