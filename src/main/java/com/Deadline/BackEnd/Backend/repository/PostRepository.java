@@ -1,9 +1,6 @@
 package com.Deadline.BackEnd.Backend.repository;
 
-import com.Deadline.BackEnd.Backend.model.Cookie;
-import com.Deadline.BackEnd.Backend.model.Post;
-import com.Deadline.BackEnd.Backend.model.PostStatus;
-import com.Deadline.BackEnd.Backend.model.User;
+import com.Deadline.BackEnd.Backend.model.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -28,6 +25,13 @@ public interface PostRepository extends JpaRepository<Post,Long> {
 
     @Query("SELECT coalesce(max(postId), 0) FROM Post")
     Long findMaxId();
+
+
+    @Query("SELECT p \n" +
+            "FROM Post p \n" +
+            "WHERE p.createAt < :timeStamp AND :tagName MEMBER OF p.tagNames\n" +
+            "ORDER BY createAt DESC LIMIT 10")
+    List<Post> pageWithTag(@Param("tagName") TagName tagName, @Param("timeStamp") Timestamp timeStamp);
 
     @Query("SELECT p \n" +
             "FROM Post p \n" +
