@@ -196,7 +196,7 @@ public class PostController {
 
         Post post = postOpt.get();
         Set<TagName> tagNames = tagRepository.findByPostWithTags(post);
-        for(TagName tagName : tagNames) tagNames.remove(post);
+        for(TagName tagName : tagNames) tagName.getPostWithTags().remove(post);
         tagRepository.saveAll(tagNames);
         postRepository.deleteByPostId(post.getPostId());
 
