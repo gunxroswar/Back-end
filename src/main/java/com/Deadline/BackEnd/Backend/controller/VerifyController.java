@@ -14,10 +14,7 @@ import com.fasterxml.jackson.databind.node.POJONode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -33,14 +30,14 @@ public class VerifyController {
 
 
     @PutMapping ("/comments/verify")
-    public ResponseEntity<String> verifyComment(@RequestHeader("Authorization") String authorizationHeader,@PathVariable("comment_id") long commentId) {
+    public ResponseEntity<String> verifyComment(@RequestHeader("Authorization") String authorizationHeader,@RequestParam("comment_id") long commentId) {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
-        String uid_string=jwt.extractUID(bearerToken);
+        Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try{
             Optional<Comment> commentOpt= commentRepository.findById(commentId);
             Comment comment =commentOpt.orElseThrow(() -> new CommentNotFoundException(commentId));
             Post post= comment.getPost();
-            if(post.getUser().getUid().equals(Long.parseLong(uid_string))   ){
+            if(post.getUser().getUid().equals(uid)   ){
                 comment.setIsVerify(true);
                 post.setHasVerify(true);
                 postRepository.save(post);
@@ -60,14 +57,14 @@ public class VerifyController {
     }
 
     @PutMapping ("/comments/unverify")
-    public ResponseEntity<String> unverifyComment(@RequestHeader("Authorization") String authorizationHeader,@PathVariable("comment_id") long commentId) {
+    public ResponseEntity<String> unverifyComment(@RequestHeader("Authorization") String authorizationHeader,@RequestParam("comment_id") long commentId) {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
-        String uid_string=jwt.extractUID(bearerToken);
+        Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try{
             Optional<Comment> commentOpt= commentRepository.findById(commentId);
             Comment comment =commentOpt.orElseThrow(() -> new CommentNotFoundException(commentId));
             Post post= comment.getPost();
-            if(post.getUser().getUid().equals(Long.parseLong(uid_string))  ){
+            if(post.getUser().getUid().equals(uid)  ){
                 comment.setIsVerify(false);
                 boolean hasVerify = false;
                 for (Comment commentInPost : commentRepository.findByPost(post)) {
