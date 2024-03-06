@@ -4,6 +4,7 @@ import com.Deadline.BackEnd.Backend.Objects.createReply;
 import com.Deadline.BackEnd.Backend.Objects.editReply;
 import com.Deadline.BackEnd.Backend.exception.CommentNotFoundException;
 import com.Deadline.BackEnd.Backend.exception.ReplyNotFoundException;
+import com.Deadline.BackEnd.Backend.exception.UserNotFoundException;
 import com.Deadline.BackEnd.Backend.model.Comment;
 import com.Deadline.BackEnd.Backend.model.PostStatus;
 import com.Deadline.BackEnd.Backend.model.Reply;
@@ -75,7 +76,7 @@ public class ReplyController {
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> createReply(@RequestBody createReply info, @RequestHeader(value = "Authorization") String authorizationHeader){
         User user = getUserFromAuthHeader(authorizationHeader);
-        if(user == null) return new ResponseEntity<>("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+        if(user == null) return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);
 
         Reply newReply = new Reply();
         Long replyId = replyRepository.findMaxId()+1L;
@@ -107,40 +108,40 @@ public class ReplyController {
         return new ResponseEntity<>("OK", HttpStatus.CREATED);
     }
 
-    @PostMapping("/replys/edit")
+    @PutMapping("/replys")
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> editReply(@RequestBody editReply info, @RequestHeader(value = "Authorization") String authorizationHeader){
+        try {
         User user = getUserFromAuthHeader(authorizationHeader);
-        if(user == null) return new ResponseEntity<>("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+        if(user == null) return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);
         Long editReplyID = Long.getLong(info.getReplyID());
-        Optional<Reply> replyOpt = replyRepository.findById(editReplyID);
-        if(replyOpt.isEmpty()) return new ResponseEntity<>("???", HttpStatus.BAD_REQUEST);
-        if(replyOpt.get().getUser() != user) return new ResponseEntity<>("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
-
+        Reply editReply = replyRepository.findById(editReplyID).orElseThrow(()->new ReplyNotFoundException(Long.getLong(info.getCommentID())));
+        if(editReply.getUser() != user) return new ResponseEntity<String>("User don't own reply "+editReply.getReplyId(), HttpStatus.FORBIDDEN);
         String topic = info.getTopic();
         String detail = info.getDetail();
         Date updateAt = new Date();
-
-        Reply reply = replyOpt.get();
-        reply.setTopic(topic);
-        reply.setDetail(detail);
-        reply.setUpdateAt(updateAt);
-
-        replyRepository.save(reply);
-
-        return new ResponseEntity<>("OK", HttpStatus.CREATED);
+        editReply.setTopic(topic);
+        editReply.setDetail(detail);
+        editReply.setUpdateAt(updateAt);
+        replyRepository.save(editReply);
+        return new ResponseEntity<>("edit reply successfully", HttpStatus.OK);
+        } catch (ReplyNotFoundException e) {
+            return new ResponseEntity<String>(e.toString(),HttpStatus.NOT_FOUND);
+        }
     }
 
-    @GetMapping("/replys/delete")
+    @DeleteMapping("/replys")
     @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<String> deleteReply(@RequestParam("replyId") Long id, @RequestHeader(value = "Authorization") String authorizationHeader){
+    public ResponseEntity<String> deleteReply(@RequestParam("replyId") Long replyId, @RequestHeader(value = "Authorization") String authorizationHeader){
+        try {
         User user = getUserFromAuthHeader(authorizationHeader);
-        if(user == null) return new ResponseEntity<>("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
-        Optional<Reply> replyOpt = replyRepository.findById(id);
-        if(replyOpt.isEmpty()) return new ResponseEntity<>("Where is this post?", HttpStatus.NOT_FOUND);
-        if(replyOpt.get().getUser() != user) return new ResponseEntity<>("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
-
-        replyRepository.deleteById(id);
-        return new ResponseEntity<>("OK", HttpStatus.OK);
+        if(user == null) return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);
+        Reply editReply = replyRepository.findById(replyId).orElseThrow(()->new ReplyNotFoundException(replyId));
+        if(editReply.getUser() != user) return new ResponseEntity<String>("User don't own reply "+editReply.getReplyId(), HttpStatus.FORBIDDEN);
+            replyRepository.deleteById(replyId);
+            return new ResponseEntity<>("delete reply successfully", HttpStatus.OK);
+        } catch (ReplyNotFoundException e) {
+            return new ResponseEntity<String>(e.toString(),HttpStatus.NOT_FOUND);
+        }
     }
 }
