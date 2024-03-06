@@ -158,7 +158,7 @@ public class PostController {
         return new ResponseEntity<>("OK", HttpStatus.CREATED);
     }
 
-    @PostMapping("/posts/edit")
+    @PutMapping("/posts/edit")
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> editPost(@RequestBody editPost info, @RequestHeader(value = "Authorization") String authorizationHeader){
         User user = getUserFromAuthHeader(authorizationHeader);
@@ -185,7 +185,7 @@ public class PostController {
         return new ResponseEntity<>("OK", HttpStatus.CREATED);
     }
 
-    @GetMapping("/posts/delete")
+    @DeleteMapping("/posts/delete")
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> deletePost(@RequestParam("postId") Long id, @RequestHeader(value = "Authorization") String authorizationHeader){
         User user = getUserFromAuthHeader(authorizationHeader);
