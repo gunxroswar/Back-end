@@ -34,6 +34,16 @@ public class PostController {
     private TagRepository tagRepository;
     private JwtService jwt = new JwtService();
 
+    private User getUserFromAuthHeader(String authorizationHeader){
+        try {
+            String bearerToken = authorizationHeader.replace("Bearer ", "");
+            String u = jwt.extractUID(bearerToken);
+            return userRepository.findById(Long.parseLong(u)).orElseThrow(() -> new UserNotFoundException(Long.parseLong(u)));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private Set<TagName> readTag(String inputString){
         List<String> infoTags = new LinkedList<>();
         StringBuilder tagReader = new StringBuilder();
@@ -71,12 +81,45 @@ public class PostController {
         return JSONTag.toString();
     }
 
+    private String postJSONBuilder(Post inputPost, User inputUser){
+        // New return JSON
+        StringBuilder sendBack = new StringBuilder();
+        // Get owner name of inputPost
+        String ownerName = "";
+        if(inputPost.getUser() != null) ownerName = inputPost.getUser().getUsername();
+        // Is inputUser like inputPost
+        boolean isLike = false;
+        Set<User> userLikePost = inputPost.getUserLikePost();
+        if(inputUser != null) isLike = userLikePost.contains(inputUser);
+        // Get all tagName of inputPost
+        Set<TagName> tagName = tagRepository.findByPostWithTags(inputPost);
+        // Count comment of inputPost
+        int commentCount = inputPost.getCommentBodies().size();
+
+        sendBack.append("{");
+        sendBack.append("\"id\":\"").append(inputPost.getPostId()).append("\",");
+        sendBack.append("\"profile_name\":\"").append(ownerName).append("\",");
+        sendBack.append("\"topic\":\"").append(inputPost.getTopic()).append("\",");
+        sendBack.append("\"detail\":\"").append(inputPost.getDetail()).append("\",");
+        sendBack.append("\"create_at\":\"").append(inputPost.getCreateAt()).append("\",");
+        sendBack.append("\"like_count\":\"").append(inputPost.getLikeCount()).append("\",");
+        sendBack.append("\"is_like\":\"").append(isLike).append("\",");
+        sendBack.append("\"has_verify\":\"").append(inputPost.getHasVerify()).append("\",");
+        sendBack.append("\"taglist\":\"").append(tagSetToJSONTag(tagName)).append("\",");
+        sendBack.append("\"commentCount\":\"").append(commentCount).append("\"");
+        sendBack.append("},");
+
+        return sendBack.toString();
+    }
+
     @PostMapping("/posts/create")
     @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<String> createPost(@RequestBody createPost info){
+    public ResponseEntity<String> createPost(@RequestBody createPost info, @RequestHeader(value = "Authorization") String authorizationHeader){
+        User user = getUserFromAuthHeader(authorizationHeader);
+        if(user == null) return new ResponseEntity<>("Fuck you", HttpStatus.FORBIDDEN);
+
         Post newPost = new Post();
         Long postId = postRepository.findMaxId()+1L;
-        User user = null;
         List<Comment> commentList = new LinkedList<>();
         String topic = info.getTopic();
         Set<TagName> tagNames = readTag(info.getTag());
@@ -114,18 +157,22 @@ public class PostController {
 
     @PostMapping("/posts/edit")
     @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<String> editPost(@RequestBody editPost info){
+    public ResponseEntity<String> editPost(@RequestBody editPost info, @RequestHeader(value = "Authorization") String authorizationHeader){
+        User user = getUserFromAuthHeader(authorizationHeader);
+        if(user == null) return new ResponseEntity<>("Fuck you", HttpStatus.FORBIDDEN);
         Long editpostId= Long.getLong(info.getPostID());
-        Optional<Post> postOpt= postRepository.findById(editpostId);
-        Post editPost =postOpt.orElseThrow(() -> new PostNotFoundException(editpostId));
-//        Post editPost = postRepository.findById(Long.getLong(info.getPostID())).get();
+        Optional<Post> postOpt = postRepository.findById(editpostId);
+        Post editPost = postOpt.orElseThrow(() -> new PostNotFoundException(editpostId));
+        if(editPost.getUser() != user) return new ResponseEntity<>("Fuck you", HttpStatus.FORBIDDEN);
         String topic = info.getTopic();
         Set<TagName> tagNames = readTag(info.getTag());
         String detail = info.getDetail();
+        Date updateAt = new Date();
 
         editPost.setTopic(topic);
         editPost.setTagNames(tagNames);
         editPost.setDetail(detail);
+        editPost.setUpdateAt(updateAt);
 
         postRepository.save(editPost);
         tagRepository.saveAll(tagNames);
@@ -133,69 +180,43 @@ public class PostController {
         return new ResponseEntity<>("OK", HttpStatus.CREATED);
     }
 
+    @GetMapping("/posts/delete")
+    @CrossOrigin(origins = "http://localhost:3000")
+    public ResponseEntity<String> deletePost(@RequestParam("postId") Long id, @RequestHeader(value = "Authorization") String authorizationHeader){
+        User user = getUserFromAuthHeader(authorizationHeader);
+        if(user == null) return new ResponseEntity<>("Fuck you", HttpStatus.FORBIDDEN);
+        Optional<Post> post = postRepository.findById(id);
+        if(post.isEmpty()) return new ResponseEntity<>("Where is this post?", HttpStatus.NOT_FOUND);
+        if(post.get().getUser() != user) return new ResponseEntity<>("Fuck you", HttpStatus.FORBIDDEN);
+
+        Set<TagName> tagNames = tagRepository.findByPostWithTags(post.get());
+        for(TagName tagName : tagNames) tagNames.remove(post.get());
+        tagRepository.saveAll(tagNames);
+        postRepository.deleteByPostId(post.get().getPostId());
+
+        return new ResponseEntity<>("OK.", HttpStatus.OK);
+    }
+
     @GetMapping("/posts")
     @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<String> getPost(@RequestParam("postId") Long id ,@RequestHeader(value = "Authorization", required = false) String authorizationHeader){
-        String bearerToken = authorizationHeader.replace("Bearer ", "");
-        User user;
-        try {
-            String u = jwt.extractUID(bearerToken);
-            user= userRepository.findById(Long.parseLong(u)).orElseThrow(()-> new UserNotFoundException(Long.parseLong(u)));
-
-
-
-        Optional<Post> search = postRepository.findById(id);
+    public ResponseEntity<String> getPost(@RequestParam("postId") Long id, @RequestHeader(value = "Authorization") String authorizationHeader){
+        User user = getUserFromAuthHeader(authorizationHeader);
+        Optional<Post> post = postRepository.findById(id);
         StringBuilder sendBack = new StringBuilder();
-        if(search.isEmpty()) sendBack.append("[]");
-        //"topic, detail , create_at, like_count, '[]' as taglist"
-        else{
-            sendBack.append("{");
-            Post currentPost = search.orElseThrow(()-> new PostNotFoundException(id));
-            sendBack.append("\"topic\":\"").append(currentPost.getTopic()).append("\",");
-            sendBack.append("\"detail\":\"").append(currentPost.getDetail()).append("\",");
-            sendBack.append("\"create_at\":\"").append(currentPost.getCreateAt()).append("\",");
-            sendBack.append("\"like_count\":\"").append(currentPost.getLikeCount()).append("\",");
-            Set<TagName> tagName = tagRepository.findByPostWithTags(currentPost);
-            sendBack.append("\"taglist\":\"").append(tagSetToJSONTag(tagName)).append("\"");
-            sendBack.append("}");
-        }
+        if(post.isEmpty()) sendBack.append("[]");
+        else sendBack.append(postJSONBuilder(post.get(), user));
 
         return new ResponseEntity<>(sendBack.toString(), HttpStatus.OK);
-        } catch (Exception e){
-            return new ResponseEntity<>(e.toString(), HttpStatus.NOT_FOUND);
-        }
     }
 
     @GetMapping("/pages")
     public ResponseEntity<String> getPage(@RequestParam("timeStamp") String timeStamp, @RequestHeader("Authorization") java.lang.String authorizationHeader){
-        if(Objects.equals(timeStamp, "0")){
-            timeStamp = "6942-01-01 12:12:12.420";
-        }
+        User user = getUserFromAuthHeader(authorizationHeader);
+        if(Objects.equals(timeStamp, "0")) timeStamp = "6942-01-01 12:12:12.420";
 
         List<Post> search = postRepository.page(Timestamp.valueOf(timeStamp));
         StringBuilder sendBack = new StringBuilder();
-        StringBuilder subSendBack = new StringBuilder();
-        //id, user.profile_name , topic, detail , create_at, like_count, has_verify, '[]' as taglist, comment.commentCount
-        for(int i = 0; i < search.size(); i++){
-            Post currentPost = search.get(i);
-            Long commentCount = commentRepository.countByPost(search.get(i));
-            subSendBack.append("{");
-            subSendBack.append("\"id\":\"").append(currentPost.getPostId()).append("\",");
-            //subSendBack.append("\"profile_name\":\"").append(currentPost.getUser().getUsername()).append("\",");
-            User user = currentPost.getUser();
-            subSendBack.append("\"profile_name\":\"").append(user.getProfileName()).append("\",");
-            subSendBack.append("\"topic\":\"").append(currentPost.getTopic()).append("\",");
-            subSendBack.append("\"detail\":\"").append(currentPost.getDetail()).append("\",");
-            subSendBack.append("\"create_at\":\"").append(currentPost.getCreateAt()).append("\",");
-            subSendBack.append("\"like_count\":\"").append(currentPost.getLikeCount()).append("\",");
-            subSendBack.append("\"has_verify\":\"").append(currentPost.getHasVerify()).append("\",");
-            Set<TagName> tagName = tagRepository.findByPostWithTags(currentPost);
-            subSendBack.append("\"taglist\":\"").append(tagSetToJSONTag(tagName)).append("\",");
-            subSendBack.append("\"commentCount\":\"").append(commentCount).append("\"");
-            subSendBack.append("},");
-            sendBack.append(subSendBack);
-            subSendBack.delete(0, subSendBack.length());
-        }
+        for(int i = 0; i < search.size(); i++) sendBack.append(postJSONBuilder(search.get(i), user));
         if(!sendBack.isEmpty()) sendBack.deleteCharAt(sendBack.length()-1);
 
         return new ResponseEntity<>("[" + sendBack + "]", HttpStatus.OK);
@@ -237,8 +258,7 @@ public class PostController {
                 subSendBack.append("{");
                 subSendBack.append("\"id\":\"").append(currentPost.getPostId()).append("\",");
                 //subSendBack.append("\"profile_name\":\"").append(currentPost.getUser().getUsername()).append("\",");
-                User user1 = currentPost.getUser();
-                subSendBack.append("\"profile_name\":\"").append(user1.getProfileName()).append("\",");
+                subSendBack.append("\"profile_name\":\"").append(currentPost.getUser()).append("\",");
                 subSendBack.append("\"topic\":\"").append(currentPost.getTopic()).append("\",");
                 subSendBack.append("\"detail\":\"").append(currentPost.getDetail()).append("\",");
                 subSendBack.append("\"create_at\":\"").append(currentPost.getCreateAt()).append("\",");
