@@ -237,8 +237,8 @@ public class PostController {
                 subSendBack.append("{");
                 subSendBack.append("\"id\":\"").append(currentPost.getPostId()).append("\",");
                 //subSendBack.append("\"profile_name\":\"").append(currentPost.getUser().getUsername()).append("\",");
-                User user = currentPost.getUser();
-                subSendBack.append("\"profile_name\":\"").append(user.getProfileName()).append("\",");
+                User user1 = currentPost.getUser();
+                subSendBack.append("\"profile_name\":\"").append(user1.getProfileName()).append("\",");
                 subSendBack.append("\"topic\":\"").append(currentPost.getTopic()).append("\",");
                 subSendBack.append("\"detail\":\"").append(currentPost.getDetail()).append("\",");
                 subSendBack.append("\"create_at\":\"").append(currentPost.getCreateAt()).append("\",");
