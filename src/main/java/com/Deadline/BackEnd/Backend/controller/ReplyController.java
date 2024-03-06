@@ -5,10 +5,7 @@ import com.Deadline.BackEnd.Backend.Objects.editReply;
 import com.Deadline.BackEnd.Backend.exception.CommentNotFoundException;
 import com.Deadline.BackEnd.Backend.exception.ReplyNotFoundException;
 import com.Deadline.BackEnd.Backend.exception.UserNotFoundException;
-import com.Deadline.BackEnd.Backend.model.Comment;
-import com.Deadline.BackEnd.Backend.model.PostStatus;
-import com.Deadline.BackEnd.Backend.model.Reply;
-import com.Deadline.BackEnd.Backend.model.User;
+import com.Deadline.BackEnd.Backend.model.*;
 import com.Deadline.BackEnd.Backend.repository.CommentRepository;
 import com.Deadline.BackEnd.Backend.repository.ReplyRepository;
 import com.Deadline.BackEnd.Backend.repository.UserRepository;
@@ -59,6 +56,22 @@ public class ReplyController {
         sendBack.append("}");
 
         return sendBack.toString();
+    }
+
+    @GetMapping("/comments/{id}/replys")
+    public ResponseEntity<String> getReplyInComment(@PathVariable(name = "id") Long commentId, @RequestHeader(value = "Authorization") String authorizationHeader) {
+        User user = getUserFromAuthHeader(authorizationHeader);
+        Optional<Comment> comment = commentRepository.findById(commentId);
+        if(comment.isEmpty()) return new ResponseEntity<>("Not found.", HttpStatus.NOT_FOUND);
+        List<Reply> search = replyRepository.findByComment(comment.get());
+        StringBuilder sendBack = new StringBuilder();
+        for(int i = 0; i < search.size(); i++) {
+            sendBack.append(replyJSONBuilder(search.get(i), user));
+            sendBack.append(",");
+        }
+        if(!sendBack.isEmpty()) sendBack.deleteCharAt(sendBack.length()-1);
+
+        return new ResponseEntity<>("[" + sendBack + "]", HttpStatus.OK);
     }
 
     @GetMapping("/replys")
