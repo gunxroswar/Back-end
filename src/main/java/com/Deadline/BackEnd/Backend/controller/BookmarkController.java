@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
+import java.rmi.server.UID;
 import java.sql.*;
 import java.util.HashSet;
 import java.util.List;
@@ -104,15 +105,19 @@ public class BookmarkController {
     }
 
     @PostMapping("/remove-bookmark")
-    public ResponseEntity<String> removeBookmarkV2(@RequestBody  BookMarkDto bookMarkDto){
+    public ResponseEntity<String> removeBookmarkV2(@RequestBody  BookMarkDto bookMarkDto,
+                                                   @RequestHeader(HttpHeaders.AUTHORIZATION) String AUTHORIZATION){
 
         String deleteQuery = "DELETE FROM bookmark WHERE user_id = ? AND post_id = ?";
-        int deletedRows = jdbcTemplate.update(deleteQuery, bookMarkDto.uid, bookMarkDto.postId);
+        System.out.println(AUTHORIZATION);
+        String UID = jwtService.extractUID(AUTHORIZATION);
+        Long uid = Long.parseLong(UID);
+        int deletedRows = jdbcTemplate.update(deleteQuery, uid, bookMarkDto.postId);
 
         if (deletedRows > 0) {
-            return ResponseEntity.ok("Bookmark removed successfully, uid = " + bookMarkDto.uid + " postId = " + bookMarkDto.postId);
+            return ResponseEntity.ok("Bookmark removed successfully, uid = " + uid + " postId = " + bookMarkDto.postId);
         } else {
-            return ResponseEntity.ok("Bookmark not found, uid = " + bookMarkDto.uid + " postId = " + bookMarkDto.postId);
+            return ResponseEntity.ok("Bookmark not found, uid = " + uid + " postId = " + bookMarkDto.postId);
         }
     }
 
