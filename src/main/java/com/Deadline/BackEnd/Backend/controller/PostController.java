@@ -132,16 +132,16 @@ public class PostController {
 
     @GetMapping("/posts")
     @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<String> getPost(@RequestParam("postId") Long postId ,@RequestHeader(value = "Authorization", required = false) String authorizationHeader){
+    public ResponseEntity<String> getPost(@RequestParam("postId") Long id ,@RequestHeader(value = "Authorization", required = false) String authorizationHeader){
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         User user;
         try {
             String u = jwt.extractUID(bearerToken);
             user= userRepository.findById(Long.parseLong(u)).orElseThrow(()-> new UserNotFoundException(Long.parseLong(u)));
+        } catch (Exception e){}
 
 
-
-        Optional<Post> search = postRepository.findById(postId);
+        Optional<Post> search = postRepository.findById(id);
         StringBuilder sendBack = new StringBuilder();
         if(search.isEmpty()) sendBack.append("[]");
         //"topic, detail , create_at, like_count, '[]' as taglist"
