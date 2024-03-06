@@ -37,7 +37,6 @@ public class LikeController {
     public JwtService jwt = new JwtService();
 
     @PutMapping("/post/like")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> likePost(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("postId") Long postId) {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         Long uid = Long.parseLong(jwt.extractUID(bearerToken));
@@ -57,7 +56,6 @@ public class LikeController {
         }
     }
     @PutMapping("/post/unlike")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> unlikePost(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("postId") Long postId) {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         Long uid = Long.parseLong(jwt.extractUID(bearerToken));
@@ -77,7 +75,6 @@ public class LikeController {
     }
 
     @PutMapping("/comment/like")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> likeComment(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("commentId") Long commentId) {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         Long uid = Long.parseLong(jwt.extractUID(bearerToken));
@@ -97,7 +94,6 @@ public class LikeController {
     }
 
     @PutMapping("/comment/unlike")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> unlikeComment(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("commentId") Long commentId) {
         String bearerToken = authorizationHeader.replace("Bearer ", "");
         Long uid = Long.parseLong(jwt.extractUID(bearerToken));

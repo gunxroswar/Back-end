@@ -24,7 +24,6 @@ public class PostController {
     private UserRepository userRepository;
 
     @PostMapping("/posts/create")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> createPost(@RequestBody createPost info){
         Post newPost = new Post();
         Long postId = postRepository.findMaxId()+1L;
@@ -63,7 +62,6 @@ public class PostController {
     }
 
     @PostMapping("/posts/edit")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> editPost(@RequestBody editPost info){
         Long editpostId= Long.getLong(info.getPostID());
         Optional<Post> postOpt= postRepository.findById(editpostId);
@@ -82,7 +80,6 @@ public class PostController {
     }
 
     @GetMapping("/posts")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> getPost(@RequestParam("postId") Long id){
         Optional<Post> search = postRepository.findById(id);
         StringBuilder sendBack = new StringBuilder();
@@ -102,7 +99,6 @@ public class PostController {
     }
 
     @GetMapping("/pages")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> getPage(@RequestParam("page") int id){
         List<Post> search = postRepository.page(1L);
         StringBuilder sendBack = new StringBuilder();
