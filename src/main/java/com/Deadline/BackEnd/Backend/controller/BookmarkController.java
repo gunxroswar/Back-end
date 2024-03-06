@@ -86,7 +86,7 @@ public class BookmarkController {
         try{
             System.out.println(AUTHORIZATION);
             String UID = jwtService.extractUID(AUTHORIZATION);
-            if(UID == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
+            if(UID == null) {return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);}
             User user = userRepository.findById(Long.parseLong(UID)).orElseThrow(
                     () -> new UsernameNotFoundException(bookMarkDto.uid.toString()));
             Post post = postRepository.findById(bookMarkDto.postId).orElseThrow(

@@ -16,6 +16,7 @@ import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -36,6 +37,7 @@ public class LikeController {
     ReplyRepository replyRepository;
     public JwtService jwt = new JwtService();
 
+    @Transactional
     @PutMapping("/post/like")
     public ResponseEntity<String> likePost(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("postId") Long postId) {
         try {
@@ -57,6 +59,8 @@ public class LikeController {
             return new ResponseEntity<String>(e.toString(), HttpStatus.NOT_FOUND);
         }
     }
+
+    @Transactional
     @PutMapping("/post/unlike")
     public ResponseEntity<String> unlikePost(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("postId") Long postId) {
         try {
@@ -67,6 +71,7 @@ public class LikeController {
             Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
             User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= post.getUserLikePost();
+            System.err.println(post.getUserLikePost());
             likeSet.remove(user);
             post.setUserLikePost(likeSet);
             post.setLikeCount((long) likeSet.size());
@@ -78,6 +83,7 @@ public class LikeController {
         }
     }
 
+    @Transactional
     @PutMapping("/comment/like")
     public ResponseEntity<String> likeComment(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("commentId") Long commentId) {
         try {
@@ -99,6 +105,7 @@ public class LikeController {
         }
     }
 
+    @Transactional
     @PutMapping("/comment/unlike")
     public ResponseEntity<String> unlikeComment(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("commentId") Long commentId) {
         try {
@@ -120,6 +127,7 @@ public class LikeController {
         }
     }
 
+    @Transactional
     @PutMapping("/reply/like")
     public ResponseEntity<String> likeReply(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("replyId") Long replyId) {
         try {
@@ -141,6 +149,7 @@ public class LikeController {
         }
     }
 
+    @Transactional
     @PutMapping("/reply/unlike")
     public ResponseEntity<String> unlikeReply(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("replyId") Long replyId) {
         try {
