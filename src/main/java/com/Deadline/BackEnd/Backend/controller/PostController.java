@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Null;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -233,7 +234,9 @@ public class PostController {
          int pageSize = 10;
         try {
             String bearerToken = authorizationHeader.replace("Bearer ", "");
-            Long uid = Long.parseLong(jwt.extractUID(bearerToken));
+            String uid_string =jwt.extractUID(bearerToken)  ;
+            if(uid_string == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
+            Long uid = Long.parseLong(uid_string);
             User user = userRepository.findById(uid).orElseThrow(() -> new UserNotFoundException(uid));
             Long numAll = postRepository.countByUser(user);
             long numPage = Math.ceilDiv(numAll,pageSize);
@@ -251,7 +254,9 @@ public class PostController {
         try {
 
             String bearerToken = authorizationHeader.replace("Bearer ", "");
-            Long uid = Long.parseLong(jwt.extractUID(bearerToken));
+            String uid_string =jwt.extractUID(bearerToken)  ;
+            if(uid_string == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
+            Long uid = Long.parseLong(uid_string);
             User user = userRepository.findById(uid).orElseThrow(() -> new UserNotFoundException(uid));
             PageRequest pageSize10AndSortByCreateAt=PageRequest.of(pageId, 10, Sort.by("createAt"));
             List<Post> search = postRepository.findByUser(user, pageSize10AndSortByCreateAt).getContent();

@@ -126,7 +126,9 @@ public class CommentController {
         try
         {
             String bearerToken = authorizationHeader.replace("Bearer ", "");
-            Long uid = Long.parseLong(jwt.extractUID(bearerToken));
+            String uid_string =jwt.extractUID(bearerToken)  ;
+            if(uid_string == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
+            Long uid = Long.parseLong(uid_string);
             Comment editComment = commentRepository.findById(Long.getLong(info.getCommentID())).orElseThrow(()->new CommentNotFoundException(Long.getLong(info.getCommentID())));
             if(editComment.getUser().getUid().equals(uid)  ){
                 String detail = info.getDetail();
@@ -150,7 +152,9 @@ public class CommentController {
     public ResponseEntity<String> deleteComment(@RequestHeader("Authorization") String authorizationHeader,@RequestParam("commentId") Long commentId){
         try {
             String bearerToken = authorizationHeader.replace("Bearer ", "");
-            Long uid = Long.parseLong(jwt.extractUID(bearerToken));
+            String uid_string =jwt.extractUID(bearerToken)  ;
+            if(uid_string == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
+            Long uid = Long.parseLong(uid_string);
             Comment deleteComment = commentRepository.findById(commentId).orElseThrow(()->new CommentNotFoundException(commentId));
             if(deleteComment.getUser().getUid().equals(uid)  ) {
                 commentRepository.deleteById(commentId);

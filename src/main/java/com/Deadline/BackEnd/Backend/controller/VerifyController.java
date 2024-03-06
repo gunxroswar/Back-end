@@ -31,9 +31,11 @@ public class VerifyController {
 
     @PutMapping ("/comments/verify")
     public ResponseEntity<String> verifyComment(@RequestHeader("Authorization") String authorizationHeader,@RequestParam("comment_id") long commentId) {
-        String bearerToken = authorizationHeader.replace("Bearer ", "");
-        Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try{
+            String bearerToken = authorizationHeader.replace("Bearer ", "");
+            String uid_string =jwt.extractUID(bearerToken)  ;
+            if(uid_string == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
+            Long uid = Long.parseLong(uid_string);
             Optional<Comment> commentOpt= commentRepository.findById(commentId);
             Comment comment =commentOpt.orElseThrow(() -> new CommentNotFoundException(commentId));
             Post post= comment.getPost();
@@ -58,9 +60,11 @@ public class VerifyController {
 
     @PutMapping ("/comments/unverify")
     public ResponseEntity<String> unverifyComment(@RequestHeader("Authorization") String authorizationHeader,@RequestParam("comment_id") long commentId) {
-        String bearerToken = authorizationHeader.replace("Bearer ", "");
-        Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try{
+            String bearerToken = authorizationHeader.replace("Bearer ", "");
+            String uid_string =jwt.extractUID(bearerToken)  ;
+            if(uid_string == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
+            Long uid = Long.parseLong(uid_string);
             Optional<Comment> commentOpt= commentRepository.findById(commentId);
             Comment comment =commentOpt.orElseThrow(() -> new CommentNotFoundException(commentId));
             Post post= comment.getPost();

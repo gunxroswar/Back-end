@@ -85,7 +85,9 @@ public class ReplyController {
     public ResponseEntity<String> editReply(@RequestHeader("Authorization") String authorizationHeader,@RequestBody editReply info){
         try{
             String bearerToken = authorizationHeader.replace("Bearer ", "");
-            Long uid = Long.parseLong(jwt.extractUID(bearerToken));
+            String uid_string =jwt.extractUID(bearerToken)  ;
+            if(uid_string == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
+            Long uid = Long.parseLong(uid_string);
             Reply editReply = replyRepository.findById(Long.getLong(info.getReplyID())).orElseThrow(()->new ReplyNotFoundException(Long.getLong(info.getReplyID())));
             if(editReply.getUser().getUid().equals(uid)  ){
                 String topic = info.getTopic();
@@ -112,7 +114,9 @@ public class ReplyController {
     public ResponseEntity<String> deleteReply(@RequestHeader("Authorization") String authorizationHeader,@RequestParam("replyId") Long replyId){
         try {
             String bearerToken = authorizationHeader.replace("Bearer ", "");
-            Long uid = Long.parseLong(jwt.extractUID(bearerToken));
+            String uid_string =jwt.extractUID(bearerToken)  ;
+            if(uid_string == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
+            Long uid = Long.parseLong(uid_string);
             Reply deleteReply = replyRepository.findById(replyId).orElseThrow(()->new ReplyNotFoundException(replyId));
             if(deleteReply.getUser().getUid().equals(uid)  ) {
                 replyRepository.deleteById(replyId);
