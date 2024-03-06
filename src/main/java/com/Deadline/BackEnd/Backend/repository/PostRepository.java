@@ -2,6 +2,7 @@ package com.Deadline.BackEnd.Backend.repository;
 
 import com.Deadline.BackEnd.Backend.model.Cookie;
 import com.Deadline.BackEnd.Backend.model.Post;
+import com.Deadline.BackEnd.Backend.model.PostStatus;
 import com.Deadline.BackEnd.Backend.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +23,8 @@ public interface PostRepository extends JpaRepository<Post,Long> {
 //   Post findByPostId(Long postId);
     List<Post> findByUser(User user);
     Post findByPostId(Long postId);
+
+    void deleteByPostId(Long postId);
 
     @Query("SELECT coalesce(max(postId), 0) FROM Post")
     Long findMaxId();

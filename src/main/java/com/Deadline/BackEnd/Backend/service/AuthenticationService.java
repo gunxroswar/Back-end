@@ -51,10 +51,10 @@ private final AuthenticationManager authenticationManager;
                 user = repository.save(user);
             }else throw new RuntimeException();
         }catch (Exception e){
-            return ResponseEntity.badRequest().body("{username: "+username+"," +
-                    " usernameDetail: "+ (username?"OK":"Username is duplicated.") +"," +
-                    " password: "+password+"," +
-                    " passwordDetail: "+(password?"OK":"Password must be more than 8 character.")+" }");
+            return ResponseEntity.badRequest().body("{\"username\": \""+username+"\"," +
+                    " \"usernameDetail\": "+ (username?"\"OK\"":"\"Username is duplicated.\"") +"," +
+                    " \"password\": \""+password+"\"," +
+                    " \"passwordDetail\": "+(password?"\"OK\"":"\"Password must be more than 8 character.\"")+" }");
         }
 
         return new ResponseEntity<String>("Success", HttpStatus.CREATED);
@@ -89,10 +89,10 @@ private final AuthenticationManager authenticationManager;
                 user = repository.save(user);
             }else throw new RuntimeException();
         }catch (Exception e){
-            return ResponseEntity.badRequest().body("{username: "+username+"," +
-                    " usernameDetail: "+ (username?"OK":"Username is duplicated.") +"," +
-                    " password: "+password+"," +
-                    " passwordDetail: "+(password?"OK":"Password must be more than 8 character.")+" }");
+            return ResponseEntity.badRequest().body("{\"username\": \""+username+"\"," +
+                    " \"usernameDetail\": "+ (username?"\"OK\"":"\"Username is duplicated.\"") +"," +
+                    " \"password\": \""+password+"\"," +
+                    " \"passwordDetail\": "+(password?"\"OK\"":"\"Password must be more than 8 character.\"")+" }");
         }
 
         return new ResponseEntity<String>("Success", HttpStatus.OK);
