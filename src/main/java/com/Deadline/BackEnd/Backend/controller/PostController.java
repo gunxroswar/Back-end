@@ -10,6 +10,7 @@ import com.Deadline.BackEnd.Backend.repository.PostRepository;
 import com.Deadline.BackEnd.Backend.repository.TagRepository;
 import com.Deadline.BackEnd.Backend.repository.UserRepository;
 import com.Deadline.BackEnd.Backend.service.JwtService;
+import org.hibernate.type.descriptor.java.JdbcTimestampJavaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -17,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -164,8 +167,12 @@ public class PostController {
     }
 
     @GetMapping("/pages")
-    public ResponseEntity<String> getPage(@RequestParam("page") int id){
-        List<Post> search = postRepository.page(1L);
+    public ResponseEntity<String> getPage(@RequestParam("timeStamp") String timeStamp, @RequestHeader("Authorization") java.lang.String authorizationHeader){
+        if(Objects.equals(timeStamp, "0")){
+            timeStamp = "6942-01-01 12:12:12.420";
+        }
+
+        List<Post> search = postRepository.page(Timestamp.valueOf(timeStamp));
         StringBuilder sendBack = new StringBuilder();
         StringBuilder subSendBack = new StringBuilder();
         //id, user.profile_name , topic, detail , create_at, like_count, has_verify, '[]' as taglist, comment.commentCount
