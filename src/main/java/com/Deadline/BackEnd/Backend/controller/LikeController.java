@@ -47,7 +47,9 @@ public class LikeController {
             Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
             User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= post.getUserLikePost();
-            likeSet.add(user);
+            if(!likeSet.contains(user)){
+                likeSet.add(user);
+            }
             post.setUserLikePost(likeSet);
             post.setLikeCount((long) likeSet.size());
             postRepository.save(post);
@@ -67,7 +69,9 @@ public class LikeController {
             Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
             User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= post.getUserLikePost();
-            likeSet.remove(user);
+            if(likeSet.contains(user)){
+                likeSet.remove(user);
+            }
             post.setUserLikePost(likeSet);
             post.setLikeCount((long) likeSet.size());
             postRepository.save(post);
@@ -88,7 +92,9 @@ public class LikeController {
             Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
             User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= comment.getUserLikeComment();
-            likeSet.add(user);
+            if(!likeSet.contains(user)){
+                likeSet.add(user);
+            }
             comment.setUserLikeComment(likeSet);
             comment.setLikeCount((long) likeSet.size());
             commentRepository.save(comment);
@@ -109,7 +115,9 @@ public class LikeController {
             Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
             User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= comment.getUserLikeComment();
-            likeSet.remove(user);
+            if(likeSet.contains(user)){
+                likeSet.remove(user);
+            }
             comment.setUserLikeComment(likeSet);
             comment.setLikeCount((long) likeSet.size());
             commentRepository.save(comment);
@@ -130,7 +138,9 @@ public class LikeController {
             Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new ReplyNotFoundException(replyId));
             User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= reply.getUserLikeReply();
-            likeSet.add(user);
+            if(!likeSet.contains(user)){
+                likeSet.add(user);
+            }
             reply.setUserLikeReply(likeSet);
             reply.setLikeCount((long) likeSet.size());
             replyRepository.save(reply);
@@ -151,7 +161,9 @@ public class LikeController {
             Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new ReplyNotFoundException(replyId));
             User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= reply.getUserLikeReply();
-            likeSet.remove(user);
+            if(likeSet.contains(user)){
+                likeSet.remove(user);
+            }
             reply.setUserLikeReply(likeSet);
             reply.setLikeCount((long) likeSet.size());
             replyRepository.save(reply);
