@@ -48,6 +48,7 @@ public class ReplyController {
         sendBack.append("{");
         sendBack.append("\"ReplyID\":\"").append(inputReply.getReplyId()).append("\",");
         sendBack.append("\"displayName\":\"").append(ownerName).append("\",");
+        sendBack.append("\"topic\":\"").append(inputReply.getTopic()).append("\",");
         sendBack.append("\"LikeAmount\":\"").append(inputReply.getLikeCount()).append("\",");
         sendBack.append("\"isLike\":\"").append(isLike).append("\",");
         sendBack.append("\"hasVerify\":\"").append(inputReply.getIsVerify()).append("\",");
