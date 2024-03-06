@@ -182,7 +182,8 @@ public class PostController {
             subSendBack.append("{");
             subSendBack.append("\"id\":\"").append(currentPost.getPostId()).append("\",");
             //subSendBack.append("\"profile_name\":\"").append(currentPost.getUser().getUsername()).append("\",");
-            subSendBack.append("\"profile_name\":\"").append(currentPost.getUser().getProfileName()).append("\",");
+            User user = currentPost.getUser();
+            subSendBack.append("\"profile_name\":\"").append(user.getProfileName()).append("\",");
             subSendBack.append("\"topic\":\"").append(currentPost.getTopic()).append("\",");
             subSendBack.append("\"detail\":\"").append(currentPost.getDetail()).append("\",");
             subSendBack.append("\"create_at\":\"").append(currentPost.getCreateAt()).append("\",");
@@ -190,7 +191,7 @@ public class PostController {
             subSendBack.append("\"has_verify\":\"").append(currentPost.getHasVerify()).append("\",");
             Set<TagName> tagName = tagRepository.findByPostWithTags(currentPost);
             subSendBack.append("\"taglist\":\"").append(tagSetToJSONTag(tagName)).append("\",");
-            subSendBack.append("\"commentCount\":\"").append(commentCount.toString()).append("\"");
+            subSendBack.append("\"commentCount\":\"").append(commentCount).append("\"");
             subSendBack.append("},");
             sendBack.append(subSendBack);
             subSendBack.delete(0, subSendBack.length());
@@ -236,7 +237,8 @@ public class PostController {
                 subSendBack.append("{");
                 subSendBack.append("\"id\":\"").append(currentPost.getPostId()).append("\",");
                 //subSendBack.append("\"profile_name\":\"").append(currentPost.getUser().getUsername()).append("\",");
-                subSendBack.append("\"profile_name\":\"").append(currentPost.getUser().getProfileName()).append("\",");
+                User user = currentPost.getUser();
+                subSendBack.append("\"profile_name\":\"").append(user.getProfileName()).append("\",");
                 subSendBack.append("\"topic\":\"").append(currentPost.getTopic()).append("\",");
                 subSendBack.append("\"detail\":\"").append(currentPost.getDetail()).append("\",");
                 subSendBack.append("\"create_at\":\"").append(currentPost.getCreateAt()).append("\",");
