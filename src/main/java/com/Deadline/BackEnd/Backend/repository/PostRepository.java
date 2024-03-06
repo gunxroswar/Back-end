@@ -11,6 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,8 +28,9 @@ public interface PostRepository extends JpaRepository<Post,Long> {
 
     @Query("SELECT p \n" +
             "FROM Post p \n" +
+            "WHERE p.createAt < :timeStamp \n" +
             "ORDER BY createAt DESC LIMIT 10")
-    List<Post> page(Long range);
+    List<Post> page(@Param("timeStamp") Timestamp timeStamp);
 
     Page<Post> findByUser(User user, PageRequest pageRequest);
 
