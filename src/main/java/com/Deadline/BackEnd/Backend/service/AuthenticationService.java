@@ -96,7 +96,7 @@ private final AuthenticationManager authenticationManager;
         }catch (Exception e){
             return ResponseEntity.badRequest().body(
                     "{\"profileName\": \""+profileName+"\"," + " \"profileNameDetail\": "+ (profileName?"\"OK\"":"\"Profile name is duplicated.\"") +"," +
-                    "{\"username\": \""+username+"\"," +
+                    "\"username\": \""+username+"\"," +
                     " \"usernameDetail\": "+ (username?"\"OK\"":"\"Username is duplicated.\"") +"," +
                     " \"password\": \""+password+"\"," +
                     " \"passwordDetail\": "+(password?"\"OK\"":"\"Password must be more than 8 character.\"")+" }");

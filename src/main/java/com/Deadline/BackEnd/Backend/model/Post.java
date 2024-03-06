@@ -75,7 +75,7 @@ public class Post {
     @ManyToMany(mappedBy = "postWithTags")
     private Set<TagName> tagNames = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
             name = "like_post",
             joinColumns = @JoinColumn(name = "postId"),

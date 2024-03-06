@@ -60,14 +60,14 @@ public class BookmarkController {
 //
 //            Post post = postRepository.findByPostId(bookMarkDto.postId);
 //            Set<Post> userBookmarkPosts = user.getBookmarkPosts();
-//            Set<User> userThatBookmark = post.getUserBookmarks();
+//            Set<User> userThatBookmark = post.getLikePost();
 //
 //            userBookmarkPosts.add(post);
 //            user.setBookmarkPosts(userBookmarkPosts);
 //            userRepository.save(user);
 //
 //            userThatBookmark.add(user);
-//            post.setUserBookmarks(userThatBookmark);
+//            post.setLikePost(userThatBookmark);
 //            postRepository.save(post);
 //
 //            return ResponseEntity.ok("Bookmark complete");
@@ -145,7 +145,7 @@ public class BookmarkController {
 //        }
 //    }
     @PostMapping("/showbookmarkV2")
-    public ResponseEntity<String>  getBookmarkedPostIds(@RequestBody BookMarkDto bookMarkDto ,
+    public ResponseEntity<Set>  getBookmarkedPostIds(@RequestBody BookMarkDto bookMarkDto ,
                                                         @RequestHeader(HttpHeaders.AUTHORIZATION) String AUTHORIZATION) {
         Set<Post> bookmarkPost = new HashSet<>();
 
@@ -154,21 +154,22 @@ public class BookmarkController {
 
             System.out.println(AUTHORIZATION);
             String UID = jwtService.extractUID(AUTHORIZATION);
-            if(UID == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
+            if(UID == null) {return new ResponseEntity<>( HttpStatus.UNAUTHORIZED);}
+//            if(UID == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
             Long newUid = Long.parseLong(UID);
             List<User> user = userRepository.findByUid(newUid);
             statement.setLong(1, newUid);
             ResultSet resultSet = statement.executeQuery();
-            if(!resultSet.next()){
-                return ResponseEntity.badRequest().body(new BookmarkNotFoundException(user.getFirst()).getMessage());
-            }
+//            if(!resultSet.next()){
+//                return ResponseEntity.badRequest().body(new BookmarkNotFoundException(user.getFirst()).getMessage());
+//            }
             while (resultSet.next()) {
                 long postId = resultSet.getLong("post_id");
                 bookmarkPost.add(postRepository.findByPostId(postId));
             }
-            return ResponseEntity.ok("Show " + bookMarkDto.uid + " bookmark posts " + bookmarkPost.size());
+            return ResponseEntity.ok(bookmarkPost);
         } catch (SQLException e) {
-            return ResponseEntity.badRequest().body(e.getMessage()); // Handle or log the exception as needed
+            return ResponseEntity.badRequest().body(new HashSet<>());
         }
     }
 

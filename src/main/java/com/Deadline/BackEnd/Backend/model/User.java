@@ -49,7 +49,12 @@ public class User implements UserDetails {
     @ManyToOne
     @JoinColumn(name ="statusId")
     private UserStatus userStatus;
-
+//    @ManyToMany(mappedBy = "like_post")
+//    public Set<Post> likePost = new HashSet<>();
+//    @ManyToMany(mappedBy = "like_comment")
+//    public Set<Comment> likeComment = new HashSet<>();
+//    @ManyToMany(mappedBy = "like_reply")
+//    public Set<Reply> likeReply = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
     private Set<Post> posts;
@@ -58,7 +63,7 @@ public class User implements UserDetails {
     @PrimaryKeyJoinColumn
     private Cookie cookie;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "bookmark",
             joinColumns = @JoinColumn(name = "userId"),
