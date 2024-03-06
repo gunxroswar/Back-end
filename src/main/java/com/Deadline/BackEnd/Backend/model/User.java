@@ -64,7 +64,7 @@ public class User implements UserDetails {
             joinColumns = @JoinColumn(name = "userId"),
             inverseJoinColumns = @JoinColumn(name = "postId")
     )
-    private Set<Post> bookmarkPosts = new HashSet<>();
+    public Set<Post> bookmarkPosts = new HashSet<>();
 
 
     @Override

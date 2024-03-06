@@ -70,7 +70,7 @@ public class Post {
     private Date updateAt;
 
     @ManyToMany(mappedBy = "bookmarkPosts")
-    private Set<User> userBookmarks = new HashSet<>();
+    public Set<User> userBookmarks = new HashSet<>();
 
     @ManyToMany(mappedBy = "postWithTags")
     private Set<TagName> tagNames = new HashSet<>();
