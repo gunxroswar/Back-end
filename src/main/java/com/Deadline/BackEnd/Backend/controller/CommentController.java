@@ -60,12 +60,12 @@ public class CommentController {
         sendBack.append("{");
         sendBack.append("\"id\":\"").append(inputComment.getCommentId()).append("\",");
         sendBack.append("\"profile_name\":\"").append(ownerName).append("\",");
-        sendBack.append("\"detail\":\"").append(inputComment.getDetail()).append("\"");
+        sendBack.append("\"detail\":\"").append(inputComment.getDetail()).append("\",");
         sendBack.append("\"create_at\":\"").append(inputComment.getCreateAt()).append("\",");
         sendBack.append("\"like_count\":\"").append(inputComment.getLikeCount()).append("\",");
         sendBack.append("\"is_like\":\"").append(isLike).append("\",");
         sendBack.append("\"hasVerify\":\"").append(inputComment.getIsVerify()).append("\",");
-        sendBack.append("\"replyCount\":\"").append(replyCount).append("\",");
+        sendBack.append("\"replyCount\":\"").append(replyCount).append("\"");
         sendBack.append("}");
 
         return sendBack.toString();
