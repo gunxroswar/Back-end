@@ -156,7 +156,6 @@ public class PostController {
     }
 
     @GetMapping("/pages")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> getPage(@RequestParam("page") int id){
         List<Post> search = postRepository.page(1L);
         StringBuilder sendBack = new StringBuilder();
@@ -175,7 +174,7 @@ public class PostController {
             subSendBack.append("\"like_count\":\"").append(currentPost.getLikeCount()).append("\",");
             subSendBack.append("\"has_verify\":\"").append(currentPost.getHasVerify()).append("\",");
             Set<TagName> tagName = tagRepository.findByPostWithTags(currentPost);
-            sendBack.append("\"taglist\":\"").append(tagSetToJSONTag(tagName)).append("\"");
+            subSendBack.append("\"taglist\":\"").append(tagSetToJSONTag(tagName)).append("\",");
             subSendBack.append("\"commentCount\":\"").append(commentCount.toString()).append("\"");
             subSendBack.append("},");
             sendBack.append(subSendBack);
