@@ -51,10 +51,12 @@ private final AuthenticationManager authenticationManager;
                 user = repository.save(user);
             }else throw new RuntimeException();
         }catch (Exception e){
-            return ResponseEntity.badRequest().body("{\"username\": \""+username+"\"," +
-                    " \"usernameDetail\": "+ (username?"\"OK\"":"\"Username is duplicated.\"") +"," +
-                    " \"password\": \""+password+"\"," +
-                    " \"passwordDetail\": "+(password?"\"OK\"":"\"Password must be more than 8 character.\"")+" }");
+            return ResponseEntity.badRequest().body(
+                    "{\"profileName\": \""+profileName+"\"," + " \"profileNameDetail\": "+ (profileName?"\"OK\"":"\"Profile name is duplicated.\"") +"," +
+                            "{\"username\": \""+username+"\"," +
+                            " \"usernameDetail\": "+ (username?"\"OK\"":"\"Username is duplicated.\"") +"," +
+                            " \"password\": \""+password+"\"," +
+                            " \"passwordDetail\": "+(password?"\"OK\"":"\"Password must be more than 8 character.\"")+" }");
         }
 
         return new ResponseEntity<String>("Success", HttpStatus.CREATED);
@@ -92,7 +94,9 @@ private final AuthenticationManager authenticationManager;
             }else return new ResponseEntity<String>("Token is expired.", HttpStatus.UNAUTHORIZED);
 
         }catch (Exception e){
-            return ResponseEntity.badRequest().body("{\"username\": \""+username+"\"," +
+            return ResponseEntity.badRequest().body(
+                    "{\"profileName\": \""+profileName+"\"," + " \"profileNameDetail\": "+ (profileName?"\"OK\"":"\"Profile name is duplicated.\"") +"," +
+                    "{\"username\": \""+username+"\"," +
                     " \"usernameDetail\": "+ (username?"\"OK\"":"\"Username is duplicated.\"") +"," +
                     " \"password\": \""+password+"\"," +
                     " \"passwordDetail\": "+(password?"\"OK\"":"\"Password must be more than 8 character.\"")+" }");
