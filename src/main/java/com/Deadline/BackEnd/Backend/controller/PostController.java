@@ -199,7 +199,7 @@ public class PostController {
 
     @GetMapping("/posts")
     @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<String> getPost(@RequestParam("postId") Long id, @RequestHeader(value = "Authorization") String authorizationHeader){
+    public ResponseEntity<String> getPost(@RequestParam("postId") Long id, @RequestHeader(value = "Authorization", required = false) String authorizationHeader){
         User user = getUserFromAuthHeader(authorizationHeader);
         Optional<Post> post = postRepository.findById(id);
         StringBuilder sendBack = new StringBuilder();
@@ -210,7 +210,7 @@ public class PostController {
     }
 
     @GetMapping("/pages")
-    public ResponseEntity<String> getPage(@RequestParam("timeStamp") String timeStamp, @RequestHeader("Authorization") java.lang.String authorizationHeader){
+    public ResponseEntity<String> getPage(@RequestParam("timeStamp") String timeStamp, @RequestHeader(value = "Authorization", required = false) java.lang.String authorizationHeader){
         User user = getUserFromAuthHeader(authorizationHeader);
         if(Objects.equals(timeStamp, "0")) timeStamp = "6942-01-01 12:12:12.420";
 
