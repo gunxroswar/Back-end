@@ -130,27 +130,27 @@ public class PostController {
 
     @GetMapping("/posts")
     @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<String> getPost(@RequestParam("postId") Long id ,@RequestHeader(value = "Authorization", required = false) String authorizationHeader){
-        String bearerToken = authorizationHeader.replace("Bearer ", "");
-        User user;
-        try {
-            String u = jwt.extractUID(bearerToken);
-            user= userRepository.findById(Long.parseLong(u)).orElseThrow(()-> new UserNotFoundException(Long.parseLong(u)));
-        } catch (Exception e){}
-
-
+    public ResponseEntity<String> getPost(@RequestParam("postId") Long id ,@RequestHeader(value = "Authorization") String authorizationHeader){
         Optional<Post> search = postRepository.findById(id);
         StringBuilder sendBack = new StringBuilder();
         if(search.isEmpty()) sendBack.append("[]");
-        //"topic, detail , create_at, like_count, '[]' as taglist"
         else{
-            sendBack.append("{");
             Post currentPost = search.get();
+            boolean isLike = false;
+            try {
+                String bearerToken = authorizationHeader.replace("Bearer ", "");
+                String u = jwt.extractUID(bearerToken);
+                User user = userRepository.findById(Long.parseLong(u)).orElseThrow(() -> new UserNotFoundException(Long.parseLong(u)));
+                if(currentPost.getUserLikePost().contains(user)) isLike = true;
+            } catch (Exception e) {}
+
+            sendBack.append("{");
             sendBack.append("\"topic\":\"").append(currentPost.getTopic()).append("\",");
             sendBack.append("\"detail\":\"").append(currentPost.getDetail()).append("\",");
             sendBack.append("\"create_at\":\"").append(currentPost.getCreateAt()).append("\",");
             sendBack.append("\"like_count\":\"").append(currentPost.getLikeCount()).append("\",");
             Set<TagName> tagName = tagRepository.findByPostWithTags(currentPost);
+            sendBack.append("\"is_like\":\"").append(isLike).append("\",");
             sendBack.append("\"taglist\":\"").append(tagSetToJSONTag(tagName)).append("\"");
             sendBack.append("}");
         }
@@ -160,27 +160,36 @@ public class PostController {
 
     @GetMapping("/pages")
     @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<String> getPage(@RequestParam("page") int id){
+    public ResponseEntity<String> getPage(@RequestParam("page") int id, @RequestHeader(value = "Authorization") String authorizationHeader){
         List<Post> search = postRepository.page(1L);
         StringBuilder sendBack = new StringBuilder();
         StringBuilder subSendBack = new StringBuilder();
         //id, user.profile_name , topic, detail , create_at, like_count, has_verify, '[]' as taglist, comment.commentCount
+        User user;
+        boolean isLike;
+        try {
+            String bearerToken = authorizationHeader.replace("Bearer ", "");
+            String u = jwt.extractUID(bearerToken);
+            user = userRepository.findById(Long.parseLong(u)).orElseThrow(() -> new UserNotFoundException(Long.parseLong(u)));
+        } catch (Exception e) {
+            user = null;
+        }
+
         for(int i = 0; i < search.size(); i++){
+            isLike = false;
             Post currentPost = search.get(i);
-            Long commentCount = commentRepository.countByPost(search.get(i));
-            subSendBack.append("{");
-            subSendBack.append("\"id\":\"").append(currentPost.getPostId()).append("\",");
-            //subSendBack.append("\"profile_name\":\"").append(currentPost.getUser().getUsername()).append("\",");
-            subSendBack.append("\"profile_name\":\"").append(currentPost.getUser()).append("\",");
-            subSendBack.append("\"topic\":\"").append(currentPost.getTopic()).append("\",");
-            subSendBack.append("\"detail\":\"").append(currentPost.getDetail()).append("\",");
-            subSendBack.append("\"create_at\":\"").append(currentPost.getCreateAt()).append("\",");
-            subSendBack.append("\"like_count\":\"").append(currentPost.getLikeCount()).append("\",");
-            subSendBack.append("\"has_verify\":\"").append(currentPost.getHasVerify()).append("\",");
+            if(user != null) if(currentPost.getUserLikePost().contains(user)) isLike = true;
+            int commentCount = currentPost.getCommentBodies().size();
+            sendBack.append("{");
+            sendBack.append("\"topic\":\"").append(currentPost.getTopic()).append("\",");
+            sendBack.append("\"detail\":\"").append(currentPost.getDetail()).append("\",");
+            sendBack.append("\"create_at\":\"").append(currentPost.getCreateAt()).append("\",");
+            sendBack.append("\"like_count\":\"").append(currentPost.getLikeCount()).append("\",");
             Set<TagName> tagName = tagRepository.findByPostWithTags(currentPost);
+            sendBack.append("\"is_like\":\"").append(isLike).append("\",");
             sendBack.append("\"taglist\":\"").append(tagSetToJSONTag(tagName)).append("\"");
-            subSendBack.append("\"commentCount\":\"").append(commentCount.toString()).append("\"");
-            subSendBack.append("},");
+            sendBack.append("}");
+            subSendBack.append("\"commentCount\":\"").append(commentCount).append("\"");
             sendBack.append(subSendBack);
             subSendBack.delete(0, subSendBack.length());
         }
