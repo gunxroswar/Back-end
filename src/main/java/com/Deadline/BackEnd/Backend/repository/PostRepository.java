@@ -1,13 +1,12 @@
 package com.Deadline.BackEnd.Backend.repository;
 
-import com.Deadline.BackEnd.Backend.model.Cookie;
-import com.Deadline.BackEnd.Backend.model.Post;
-import com.Deadline.BackEnd.Backend.model.PostStatus;
-import com.Deadline.BackEnd.Backend.model.User;
+import com.Deadline.BackEnd.Backend.model.*;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -29,6 +28,13 @@ public interface PostRepository extends JpaRepository<Post,Long> {
     @Query("SELECT coalesce(max(postId), 0) FROM Post")
     Long findMaxId();
 
+
+    @Query("SELECT p \n" +
+            "FROM Post p \n" +
+            "WHERE p.createAt < :timeStamp AND :tagName MEMBER OF p.tagNames\n" +
+            "ORDER BY createAt DESC LIMIT 10")
+    List<Post> pageWithTag(@Param("tagName") TagName tagName, @Param("timeStamp") Timestamp timeStamp);
+
     @Query("SELECT p \n" +
             "FROM Post p \n" +
             "WHERE p.createAt < :timeStamp \n" +
@@ -38,6 +44,11 @@ public interface PostRepository extends JpaRepository<Post,Long> {
     Page<Post> findByUser(User user, PageRequest pageRequest);
 
     Long countByUser(User user);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM like_post WHERE post_id = :post_id AND user_id = :user_id", nativeQuery = true)
+    void deleteLike(@Param("post_id") Long postId, @Param("user_id") Long userId);
 
 
 //    @Query("SELECT p \n" +
