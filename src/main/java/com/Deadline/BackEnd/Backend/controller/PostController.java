@@ -159,7 +159,7 @@ public class PostController {
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> editPost(@RequestBody editPost info, @RequestHeader(value = "Authorization") String authorizationHeader){
         User user = getUserFromAuthHeader(authorizationHeader);
-        if(user == null) return new ResponseEntity<>("Authorization is NULL", HttpStatus.FORBIDDEN);
+        if(user == null) return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);
         Long editpostId= Long.getLong(info.getPostID());
         Optional<Post> postOpt = postRepository.findById(editpostId);
         Post editPost = postOpt.orElseThrow(() -> new PostNotFoundException(editpostId));
@@ -186,7 +186,7 @@ public class PostController {
         try
         {
             User user = getUserFromAuthHeader(authorizationHeader);
-            if(user == null) return new ResponseEntity<>("Authorization is NULL", HttpStatus.FORBIDDEN);
+            if(user == null) return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);
             Post detelePost = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 
             if(detelePost.getUser() != user) return new ResponseEntity<>("User don't own post "+ postId, HttpStatus.FORBIDDEN);
@@ -249,6 +249,7 @@ public class PostController {
     {
 
         try {
+
             String bearerToken = authorizationHeader.replace("Bearer ", "");
             Long uid = Long.parseLong(jwt.extractUID(bearerToken));
             User user = userRepository.findById(uid).orElseThrow(() -> new UserNotFoundException(uid));
