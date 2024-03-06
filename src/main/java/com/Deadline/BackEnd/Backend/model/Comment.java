@@ -71,7 +71,7 @@ public class Comment {
     @UpdateTimestamp
     @Column(name = "UpdateAt")
     private Date updateAt;
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
             name = "like_comment",
             joinColumns = @JoinColumn(name = "commentId"),
