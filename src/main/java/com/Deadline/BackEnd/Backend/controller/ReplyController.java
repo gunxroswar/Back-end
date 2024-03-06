@@ -1,13 +1,10 @@
 package com.Deadline.BackEnd.Backend.controller;
 
 import com.Deadline.BackEnd.Backend.Objects.createReply;
+import com.Deadline.BackEnd.Backend.Objects.editPost;
 import com.Deadline.BackEnd.Backend.Objects.editReply;
-import com.Deadline.BackEnd.Backend.exception.CommentNotFoundException;
-import com.Deadline.BackEnd.Backend.exception.ReplyNotFoundException;
-import com.Deadline.BackEnd.Backend.model.Comment;
-import com.Deadline.BackEnd.Backend.model.PostStatus;
-import com.Deadline.BackEnd.Backend.model.Reply;
-import com.Deadline.BackEnd.Backend.model.User;
+import com.Deadline.BackEnd.Backend.exception.UserNotFoundException;
+import com.Deadline.BackEnd.Backend.model.*;
 import com.Deadline.BackEnd.Backend.repository.CommentRepository;
 import com.Deadline.BackEnd.Backend.repository.ReplyRepository;
 import com.Deadline.BackEnd.Backend.repository.UserRepository;
@@ -27,34 +24,60 @@ public class ReplyController {
     CommentRepository commentRepository;
     @Autowired
     UserRepository userRepository;
+    private JwtService jwt = new JwtService();
 
-    public JwtService jwt = new JwtService();
+    private User getUserFromAuthHeader(String authorizationHeader){
+        try {
+            String bearerToken = authorizationHeader.replace("Bearer ", "");
+            String u = jwt.extractUID(bearerToken);
+            return userRepository.findById(Long.parseLong(u)).orElseThrow(() -> new UserNotFoundException(Long.parseLong(u)));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private String replyJSONBuilder(Reply inputReply, User inputUser){
+        StringBuilder sendBack = new StringBuilder();
+        String ownerName = "";
+        if(inputReply.getUser() != null) ownerName = inputReply.getUser().getUsername();
+        boolean isLike = false;
+        Set<User> userLikeReply = inputReply.getUserLikeReply();
+        if(inputUser != null) isLike = userLikeReply.contains(inputUser);
+
+        sendBack.append("{");
+        sendBack.append("\"ReplyID\":\"").append(inputReply.getReplyId()).append("\",");
+        sendBack.append("\"displayName\":\"").append(ownerName).append("\",");
+        sendBack.append("\"LikeAmount\":\"").append(inputReply.getLikeCount()).append("\",");
+        sendBack.append("\"isLike\":\"").append(isLike).append("\",");
+        sendBack.append("\"hasVerify\":\"").append(inputReply.getIsVerify()).append("\",");
+        sendBack.append("\"CreateDate\":\"").append(inputReply.getCreateAt()).append("\",");
+        sendBack.append("\"detail\":\"").append(inputReply.getDetail()).append("\"");
+        sendBack.append("}");
+
+        return sendBack.toString();
+    }
 
     @GetMapping("/replys")
-    public ResponseEntity<String> getReply(@RequestParam("replyId") Long id){
+    @CrossOrigin(origins = "http://localhost:3000")
+    public ResponseEntity<String> getReply(@RequestParam("replyId") Long id, @RequestHeader(value = "Authorization") String authorizationHeader){
+        User user = getUserFromAuthHeader(authorizationHeader);
         Optional<Reply> replyOpt = replyRepository.findById(id);
         if(replyOpt.isEmpty()) return new ResponseEntity<>("[]", HttpStatus.NOT_FOUND);
-        Reply reply = replyOpt.get();
-        String displayName = userRepository.findByUid(reply.getReplyId()).getFirst().getUsername();
-        StringBuilder sendBack = new StringBuilder("[{");
-        sendBack.append("\"ReplyID\":\"").append(reply.getReplyId()).append("\",");
-        //sendBack.append("\"displayName\":\"").append(reply).append("\",");
-        sendBack.append("\"displayName\":\"").append(displayName).append("\",");
-        sendBack.append("\"LikeAmount\":\"").append(reply.getLikeCount()).append("\",");
-        sendBack.append("\"hasVerify\":\"").append(reply.getIsVerify()).append("\",");
-        sendBack.append("\"CreateDate\":\"").append(reply.getCreateAt()).append("\",");
-        sendBack.append("\"detail\":\"").append(reply.getDetail()).append("\"");
-        sendBack.append("}]");
+        String reply = "[" + replyJSONBuilder(replyOpt.get(), user) + "]";
 
-        return new ResponseEntity<>(sendBack.toString(), HttpStatus.OK);
+        return new ResponseEntity<>(reply, HttpStatus.OK);
     }
 
     @PostMapping("/replys/create")
-    public ResponseEntity<String> createReply(@RequestBody createReply info){
+    @CrossOrigin(origins = "http://localhost:3000")
+    public ResponseEntity<String> createReply(@RequestBody createReply info, @RequestHeader(value = "Authorization") String authorizationHeader){
+        User user = getUserFromAuthHeader(authorizationHeader);
+        if(user == null) return new ResponseEntity<>("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+
         Reply newReply = new Reply();
         Long replyId = replyRepository.findMaxId()+1L;
-        Comment comment = commentRepository.findById(Long.parseLong(info.getCommentID())).get();
-        User user = null;
+        Optional<Comment> comment = commentRepository.findById(Long.parseLong(info.getCommentID()));
+        if(comment.isEmpty()) return new ResponseEntity<>("???", HttpStatus.BAD_REQUEST);
         String topic = info.getTopic();
         String detail = info.getDetail();
         Long likeCount = 0L;
@@ -66,7 +89,7 @@ public class ReplyController {
         Set<User> userLikeReply = new HashSet<>();
 
         newReply.setReplyId(replyId);
-        newReply.setComment(comment);
+        newReply.setComment(comment.get());
         newReply.setUser(user);
         newReply.setTopic(topic);
         newReply.setDetail(detail);
@@ -81,49 +104,40 @@ public class ReplyController {
         return new ResponseEntity<>("OK", HttpStatus.CREATED);
     }
 
-    @PutMapping("/replys")
-    public ResponseEntity<String> editReply(@RequestHeader("Authorization") String authorizationHeader,@RequestBody editReply info){
-        try{
-            String bearerToken = authorizationHeader.replace("Bearer ", "");
-            Long uid = Long.parseLong(jwt.extractUID(bearerToken));
-            Reply editReply = replyRepository.findById(Long.getLong(info.getReplyID())).orElseThrow(()->new ReplyNotFoundException(Long.getLong(info.getReplyID())));
-            if(editReply.getUser().getUid().equals(uid)  ){
-                String topic = info.getTopic();
-                String detail = info.getDetail();
+    @PostMapping("/replys/edit")
+    @CrossOrigin(origins = "http://localhost:3000")
+    public ResponseEntity<String> editReply(@RequestBody editReply info, @RequestHeader(value = "Authorization") String authorizationHeader){
+        User user = getUserFromAuthHeader(authorizationHeader);
+        if(user == null) return new ResponseEntity<>("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+        Long editReplyID = Long.getLong(info.getReplyID());
+        Optional<Reply> replyOpt = replyRepository.findById(editReplyID);
+        if(replyOpt.isEmpty()) return new ResponseEntity<>("???", HttpStatus.BAD_REQUEST);
+        if(replyOpt.get().getUser() != user) return new ResponseEntity<>("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
 
-                editReply.setTopic(topic);
-                editReply.setDetail(detail);
+        String topic = info.getTopic();
+        String detail = info.getDetail();
+        Date updateAt = new Date();
 
-                replyRepository.save(editReply);
+        Reply reply = replyOpt.get();
+        reply.setTopic(topic);
+        reply.setDetail(detail);
+        reply.setUpdateAt(updateAt);
 
-                return new ResponseEntity<String>("edit reply successfully", HttpStatus.OK);
-            }
-            else {
-                return new ResponseEntity<String>("User don't own reply "+ editReply.getReplyId(), HttpStatus.FORBIDDEN);
-            }
-        }catch (ReplyNotFoundException e)
-        {
-            return new ResponseEntity<String>(e.toString(),HttpStatus.NOT_FOUND);
-        }
+        replyRepository.save(reply);
 
+        return new ResponseEntity<>("OK", HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/replys")
-    public ResponseEntity<String> deleteReply(@RequestHeader("Authorization") String authorizationHeader,@RequestParam("replyId") Long replyId){
-        try {
-            String bearerToken = authorizationHeader.replace("Bearer ", "");
-            Long uid = Long.parseLong(jwt.extractUID(bearerToken));
-            Reply deleteReply = replyRepository.findById(replyId).orElseThrow(()->new ReplyNotFoundException(replyId));
-            if(deleteReply.getUser().getUid().equals(uid)  ) {
-                replyRepository.deleteById(replyId);
-                return new ResponseEntity<>("delete reply successfully", HttpStatus.OK);
-            }
-            else{
-                return new ResponseEntity<String>("User don't own reply "+ deleteReply.getReplyId(), HttpStatus.FORBIDDEN);
-            }
-        }catch (ReplyNotFoundException e)
-        {
-            return new ResponseEntity<String>(e.toString(),HttpStatus.NOT_FOUND);
-        }
+    @GetMapping("/replys/delete")
+    @CrossOrigin(origins = "http://localhost:3000")
+    public ResponseEntity<String> deleteReply(@RequestParam("replyId") Long id, @RequestHeader(value = "Authorization") String authorizationHeader){
+        User user = getUserFromAuthHeader(authorizationHeader);
+        if(user == null) return new ResponseEntity<>("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+        Optional<Reply> replyOpt = replyRepository.findById(id);
+        if(replyOpt.isEmpty()) return new ResponseEntity<>("Where is this post?", HttpStatus.NOT_FOUND);
+        if(replyOpt.get().getUser() != user) return new ResponseEntity<>("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+
+        replyRepository.deleteById(id);
+        return new ResponseEntity<>("OK", HttpStatus.OK);
     }
 }
