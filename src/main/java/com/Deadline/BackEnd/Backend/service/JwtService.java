@@ -28,7 +28,11 @@ public class JwtService {
     }
 
     public String extractUID(String token){
-        return extractClaim(token, Claims::getSubject);
+        try {
+            return extractClaim(token, Claims::getSubject);
+        } catch (Exception e){
+            return null;
+        }
     }
 
     public boolean isValid(String token , UserDetails user){
