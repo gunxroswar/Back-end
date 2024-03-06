@@ -208,7 +208,7 @@ public class PostController {
     public ResponseEntity<String> getPost(@RequestParam("postId") Long id, @RequestHeader(value = "Authorization") String authorizationHeader){
         User user = getUserFromAuthHeader(authorizationHeader);
         Optional<Post> postOpt = postRepository.findById(id);
-//        System.out.println(postOpt.get());
+        System.out.println(postOpt.get());
         Post temp = postOpt.orElse(null);
         StringBuilder sendBack = new StringBuilder();
         if(temp==null) sendBack.append("[]");
@@ -227,6 +227,7 @@ public class PostController {
         List<Post> search = postRepository.page(Timestamp.valueOf(timeStamp));
         StringBuilder sendBack = new StringBuilder();
         for(int i = 0; i < search.size(); i++) {
+//            System.out.println(search.get(i));
             sendBack.append(postJSONBuilder(search.get(i), user));
             sendBack.append(",");
         }

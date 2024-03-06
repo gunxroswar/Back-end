@@ -75,6 +75,7 @@ public class LikeController {
             likeSet.remove(user);
             post.setUserLikePost(likeSet);
             post.setLikeCount((long) likeSet.size());
+            postRepository.deleteLike(post.getPostId(), user.getUid());
             postRepository.saveAndFlush(post);
             return new ResponseEntity<>("Post with ID " + postId + " is unliked", HttpStatus.OK);
 
