@@ -60,14 +60,14 @@ public class BookmarkController {
 //
 //            Post post = postRepository.findByPostId(bookMarkDto.postId);
 //            Set<Post> userBookmarkPosts = user.getBookmarkPosts();
-//            Set<User> userThatBookmark = post.getUserBookmarks();
+//            Set<User> userThatBookmark = post.getLikePost();
 //
 //            userBookmarkPosts.add(post);
 //            user.setBookmarkPosts(userBookmarkPosts);
 //            userRepository.save(user);
 //
 //            userThatBookmark.add(user);
-//            post.setUserBookmarks(userThatBookmark);
+//            post.setLikePost(userThatBookmark);
 //            postRepository.save(post);
 //
 //            return ResponseEntity.ok("Bookmark complete");
@@ -154,7 +154,8 @@ public class BookmarkController {
 
             System.out.println(AUTHORIZATION);
             String UID = jwtService.extractUID(AUTHORIZATION);
-            if(UID == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
+            if(UID == null) {return new ResponseEntity<>( HttpStatus.UNAUTHORIZED);}
+//            if(UID == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
             Long newUid = Long.parseLong(UID);
             List<User> user = userRepository.findByUid(newUid);
             statement.setLong(1, newUid);
