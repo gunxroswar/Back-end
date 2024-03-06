@@ -107,7 +107,7 @@ public class PostController {
         sendBack.append("\"has_verify\":\"").append(inputPost.getHasVerify()).append("\",");
         sendBack.append("\"taglist\":\"").append(tagSetToJSONTag(tagName)).append("\",");
         sendBack.append("\"commentCount\":\"").append(commentCount).append("\"");
-        sendBack.append("},");
+        sendBack.append("}");
 
         return sendBack.toString();
     }
@@ -116,7 +116,7 @@ public class PostController {
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> createPost(@RequestBody createPost info, @RequestHeader(value = "Authorization") String authorizationHeader){
         User user = getUserFromAuthHeader(authorizationHeader);
-        if(user == null) return new ResponseEntity<>("Fuck you", HttpStatus.FORBIDDEN);
+        if(user == null) return new ResponseEntity<>("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
 
         Post newPost = new Post();
         Long postId = postRepository.findMaxId()+1L;
@@ -159,22 +159,24 @@ public class PostController {
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> editPost(@RequestBody editPost info, @RequestHeader(value = "Authorization") String authorizationHeader){
         User user = getUserFromAuthHeader(authorizationHeader);
-        if(user == null) return new ResponseEntity<>("Fuck you", HttpStatus.FORBIDDEN);
-        Long editpostId= Long.getLong(info.getPostID());
-        Optional<Post> postOpt = postRepository.findById(editpostId);
-        Post editPost = postOpt.orElseThrow(() -> new PostNotFoundException(editpostId));
-        if(editPost.getUser() != user) return new ResponseEntity<>("Fuck you", HttpStatus.FORBIDDEN);
+        if(user == null) return new ResponseEntity<>("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+        Long editPostId = Long.getLong(info.getPostID());
+        Optional<Post> postOpt = postRepository.findById(editPostId);
+        if(postOpt.isEmpty()) return new ResponseEntity<>("???", HttpStatus.BAD_REQUEST);
+        if(postOpt.get().getUser() != user) return new ResponseEntity<>("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+
         String topic = info.getTopic();
         Set<TagName> tagNames = readTag(info.getTag());
         String detail = info.getDetail();
         Date updateAt = new Date();
 
-        editPost.setTopic(topic);
-        editPost.setTagNames(tagNames);
-        editPost.setDetail(detail);
-        editPost.setUpdateAt(updateAt);
+        Post post = postOpt.get();
+        post.setTopic(topic);
+        post.setTagNames(tagNames);
+        post.setDetail(detail);
+        post.setUpdateAt(updateAt);
 
-        postRepository.save(editPost);
+        postRepository.save(post);
         tagRepository.saveAll(tagNames);
 
         return new ResponseEntity<>("OK", HttpStatus.CREATED);
@@ -184,39 +186,43 @@ public class PostController {
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> deletePost(@RequestParam("postId") Long id, @RequestHeader(value = "Authorization") String authorizationHeader){
         User user = getUserFromAuthHeader(authorizationHeader);
-        if(user == null) return new ResponseEntity<>("Fuck you", HttpStatus.FORBIDDEN);
-        Optional<Post> post = postRepository.findById(id);
-        if(post.isEmpty()) return new ResponseEntity<>("Where is this post?", HttpStatus.NOT_FOUND);
-        if(post.get().getUser() != user) return new ResponseEntity<>("Fuck you", HttpStatus.FORBIDDEN);
+        if(user == null) return new ResponseEntity<>("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+        Optional<Post> postOpt = postRepository.findById(id);
+        if(postOpt.isEmpty()) return new ResponseEntity<>("Where is this post?", HttpStatus.NOT_FOUND);
+        if(postOpt.get().getUser() != user) return new ResponseEntity<>("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
 
-        Set<TagName> tagNames = tagRepository.findByPostWithTags(post.get());
-        for(TagName tagName : tagNames) tagNames.remove(post.get());
+        Post post = postOpt.get();
+        Set<TagName> tagNames = tagRepository.findByPostWithTags(post);
+        for(TagName tagName : tagNames) tagNames.remove(post);
         tagRepository.saveAll(tagNames);
-        postRepository.deleteByPostId(post.get().getPostId());
+        postRepository.deleteByPostId(post.getPostId());
 
         return new ResponseEntity<>("OK.", HttpStatus.OK);
     }
 
     @GetMapping("/posts")
     @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<String> getPost(@RequestParam("postId") Long id, @RequestHeader(value = "Authorization", required = false) String authorizationHeader){
+    public ResponseEntity<String> getPost(@RequestParam("postId") Long id, @RequestHeader(value = "Authorization") String authorizationHeader){
         User user = getUserFromAuthHeader(authorizationHeader);
-        Optional<Post> post = postRepository.findById(id);
+        Optional<Post> postOpt = postRepository.findById(id);
         StringBuilder sendBack = new StringBuilder();
-        if(post.isEmpty()) sendBack.append("[]");
-        else sendBack.append(postJSONBuilder(post.get(), user));
+        if(postOpt.isEmpty()) sendBack.append("[]");
+        else sendBack.append(postJSONBuilder(postOpt.get(), user));
 
         return new ResponseEntity<>(sendBack.toString(), HttpStatus.OK);
     }
 
     @GetMapping("/pages")
-    public ResponseEntity<String> getPage(@RequestParam("timeStamp") String timeStamp, @RequestHeader(value = "Authorization", required = false) java.lang.String authorizationHeader){
+    public ResponseEntity<String> getPage(@RequestParam("timeStamp") String timeStamp, @RequestHeader(value = "Authorization") String authorizationHeader){
         User user = getUserFromAuthHeader(authorizationHeader);
         if(Objects.equals(timeStamp, "0")) timeStamp = "6942-01-01 12:12:12.420";
 
         List<Post> search = postRepository.page(Timestamp.valueOf(timeStamp));
         StringBuilder sendBack = new StringBuilder();
-        for(int i = 0; i < search.size(); i++) sendBack.append(postJSONBuilder(search.get(i), user));
+        for(int i = 0; i < search.size(); i++) {
+            sendBack.append(postJSONBuilder(search.get(i), user));
+            sendBack.append(",");
+        }
         if(!sendBack.isEmpty()) sendBack.deleteCharAt(sendBack.length()-1);
 
         return new ResponseEntity<>("[" + sendBack + "]", HttpStatus.OK);
