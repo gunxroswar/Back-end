@@ -116,7 +116,7 @@ public class PostController {
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> createPost(@RequestBody createPost info, @RequestHeader(value = "Authorization") String authorizationHeader){
         User user = getUserFromAuthHeader(authorizationHeader);
-        if(user == null) return new ResponseEntity<>("Fuck you", HttpStatus.FORBIDDEN);
+        if(user == null) return new ResponseEntity<>("Authorization is NULL", HttpStatus.FORBIDDEN);
 
         Post newPost = new Post();
         Long postId = postRepository.findMaxId()+1L;
@@ -155,15 +155,15 @@ public class PostController {
         return new ResponseEntity<>("OK", HttpStatus.CREATED);
     }
 
-    @PostMapping("/posts/edit")
+    @PutMapping("/posts")
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> editPost(@RequestBody editPost info, @RequestHeader(value = "Authorization") String authorizationHeader){
         User user = getUserFromAuthHeader(authorizationHeader);
-        if(user == null) return new ResponseEntity<>("Fuck you", HttpStatus.FORBIDDEN);
+        if(user == null) return new ResponseEntity<>("Authorization is NULL", HttpStatus.FORBIDDEN);
         Long editpostId= Long.getLong(info.getPostID());
         Optional<Post> postOpt = postRepository.findById(editpostId);
         Post editPost = postOpt.orElseThrow(() -> new PostNotFoundException(editpostId));
-        if(editPost.getUser() != user) return new ResponseEntity<>("Fuck you", HttpStatus.FORBIDDEN);
+        if(editPost.getUser() != user) return new ResponseEntity<>("User don't own post "+ editPost.getPostId(), HttpStatus.FORBIDDEN);
         String topic = info.getTopic();
         Set<TagName> tagNames = readTag(info.getTag());
         String detail = info.getDetail();
@@ -177,24 +177,29 @@ public class PostController {
         postRepository.save(editPost);
         tagRepository.saveAll(tagNames);
 
-        return new ResponseEntity<>("OK", HttpStatus.CREATED);
+        return new ResponseEntity<>("edit post successfully", HttpStatus.OK);
     }
 
-    @GetMapping("/posts/delete")
+    @DeleteMapping("/posts")
     @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<String> deletePost(@RequestParam("postId") Long id, @RequestHeader(value = "Authorization") String authorizationHeader){
-        User user = getUserFromAuthHeader(authorizationHeader);
-        if(user == null) return new ResponseEntity<>("Fuck you", HttpStatus.FORBIDDEN);
-        Optional<Post> post = postRepository.findById(id);
-        if(post.isEmpty()) return new ResponseEntity<>("Where is this post?", HttpStatus.NOT_FOUND);
-        if(post.get().getUser() != user) return new ResponseEntity<>("Fuck you", HttpStatus.FORBIDDEN);
+    public ResponseEntity<String> deletePost(@RequestParam("postId") Long postId, @RequestHeader(value = "Authorization") String authorizationHeader){
+        try
+        {
+            User user = getUserFromAuthHeader(authorizationHeader);
+            if(user == null) return new ResponseEntity<>("Authorization is NULL", HttpStatus.FORBIDDEN);
+            Post detelePost = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 
-        Set<TagName> tagNames = tagRepository.findByPostWithTags(post.get());
-        for(TagName tagName : tagNames) tagNames.remove(post.get());
-        tagRepository.saveAll(tagNames);
-        postRepository.deleteByPostId(post.get().getPostId());
+            if(detelePost.getUser() != user) return new ResponseEntity<>("User don't own post "+ postId, HttpStatus.FORBIDDEN);
 
-        return new ResponseEntity<>("OK.", HttpStatus.OK);
+            Set<TagName> tagNames = tagRepository.findByPostWithTags(detelePost);
+            for(TagName tagName : tagNames) tagNames.remove(detelePost);
+            tagRepository.saveAll(tagNames);
+            postRepository.deleteByPostId(detelePost.getPostId());
+
+            return new ResponseEntity<>("delete post successfully", HttpStatus.OK);
+        } catch (PostNotFoundException e) {
+            return  new ResponseEntity<>(e.toString(),HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/posts")
@@ -233,7 +238,7 @@ public class PostController {
             Long numAll = postRepository.countByUser(user);
             long numPage = Math.ceilDiv(numAll,pageSize);
             return new ResponseEntity<>(Long.toString(numPage), HttpStatus.OK);
-        } catch (NumberFormatException | UserNotFoundException e) {
+        } catch ( UserNotFoundException e) {
             return  new ResponseEntity<>(e.toString(),HttpStatus.NOT_FOUND);
         }
 
@@ -252,9 +257,8 @@ public class PostController {
             StringBuilder sendBack = new StringBuilder();
             StringBuilder subSendBack = new StringBuilder();
             //id, user.profile_name , topic, detail , create_at, like_count, has_verify, '[]' as taglist, comment.commentCount
-            for (int i = 0; i < search.size(); i++) {
-                Post currentPost = search.get(i);
-                Long commentCount = commentRepository.countByPost(search.get(i));
+            for (Post currentPost : search) {
+                Long commentCount = commentRepository.countByPost(currentPost);
                 subSendBack.append("{");
                 subSendBack.append("\"id\":\"").append(currentPost.getPostId()).append("\",");
                 //subSendBack.append("\"profile_name\":\"").append(currentPost.getUser().getUsername()).append("\",");
@@ -278,7 +282,9 @@ public class PostController {
             return new ResponseEntity<>(e.toString(),HttpStatus.NOT_FOUND);
         }
 
+
     }
+
 
 
 
