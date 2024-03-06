@@ -11,6 +11,7 @@ import com.Deadline.BackEnd.Backend.repository.UserRepository;
 import com.Deadline.BackEnd.Backend.service.JwtService;
 
 import com.google.common.net.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,6 +30,7 @@ import java.util.Set;
 @RestController
 public class BookmarkController {
     private final JwtService jwtService;
+
     public UserRepository userRepository;
     public PostRepository postRepository;
     public JdbcTemplate jdbcTemplate;
@@ -84,6 +86,7 @@ public class BookmarkController {
         try{
             System.out.println(AUTHORIZATION);
             String UID = jwtService.extractUID(AUTHORIZATION);
+            if(UID == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
             User user = userRepository.findById(Long.parseLong(UID)).orElseThrow(
                     () -> new UsernameNotFoundException(bookMarkDto.uid.toString()));
             Post post = postRepository.findById(bookMarkDto.postId).orElseThrow(
@@ -111,6 +114,7 @@ public class BookmarkController {
         String deleteQuery = "DELETE FROM bookmark WHERE user_id = ? AND post_id = ?";
         System.out.println(AUTHORIZATION);
         String UID = jwtService.extractUID(AUTHORIZATION);
+        if(UID == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
         Long uid = Long.parseLong(UID);
         int deletedRows = jdbcTemplate.update(deleteQuery, uid, bookMarkDto.postId);
 
@@ -150,6 +154,7 @@ public class BookmarkController {
 
             System.out.println(AUTHORIZATION);
             String UID = jwtService.extractUID(AUTHORIZATION);
+            if(UID == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
             Long newUid = Long.parseLong(UID);
             List<User> user = userRepository.findByUid(newUid);
             statement.setLong(1, newUid);

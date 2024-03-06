@@ -38,14 +38,18 @@ public class LikeController {
 
     @PutMapping("/post/like")
     public ResponseEntity<String> likePost(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("postId") Long postId) {
-        String bearerToken = authorizationHeader.replace("Bearer ", "");
-        Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try {
+            String bearerToken = authorizationHeader.replace("Bearer ", "");
+            String uid_string =jwt.extractUID(bearerToken)  ;
+            if(uid_string == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
+            Long uid = Long.parseLong(uid_string);
             System.out.println("postID = "+(postId));
             Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
             User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= post.getUserLikePost();
-            likeSet.add(user);
+            if(!likeSet.contains(user)){
+                likeSet.add(user);
+            }
             post.setUserLikePost(likeSet);
             post.setLikeCount((long) likeSet.size());
             postRepository.save(post);
@@ -57,13 +61,17 @@ public class LikeController {
     }
     @PutMapping("/post/unlike")
     public ResponseEntity<String> unlikePost(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("postId") Long postId) {
-        String bearerToken = authorizationHeader.replace("Bearer ", "");
-        Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try {
+            String bearerToken = authorizationHeader.replace("Bearer ", "");
+            String uid_string =jwt.extractUID(bearerToken)  ;
+            if(uid_string == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
+            Long uid = Long.parseLong(uid_string);
             Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
             User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= post.getUserLikePost();
-            likeSet.remove(user);
+            if(likeSet.contains(user)){
+                likeSet.remove(user);
+            }
             post.setUserLikePost(likeSet);
             post.setLikeCount((long) likeSet.size());
             postRepository.save(post);
@@ -76,13 +84,17 @@ public class LikeController {
 
     @PutMapping("/comment/like")
     public ResponseEntity<String> likeComment(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("commentId") Long commentId) {
-        String bearerToken = authorizationHeader.replace("Bearer ", "");
-        Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try {
+            String bearerToken = authorizationHeader.replace("Bearer ", "");
+            String uid_string =jwt.extractUID(bearerToken)  ;
+            if(uid_string == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
+            Long uid = Long.parseLong(uid_string);
             Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
             User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= comment.getUserLikeComment();
-            likeSet.add(user);
+            if(!likeSet.contains(user)){
+                likeSet.add(user);
+            }
             comment.setUserLikeComment(likeSet);
             comment.setLikeCount((long) likeSet.size());
             commentRepository.save(comment);
@@ -95,13 +107,17 @@ public class LikeController {
 
     @PutMapping("/comment/unlike")
     public ResponseEntity<String> unlikeComment(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("commentId") Long commentId) {
-        String bearerToken = authorizationHeader.replace("Bearer ", "");
-        Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try {
+            String bearerToken = authorizationHeader.replace("Bearer ", "");
+            String uid_string =jwt.extractUID(bearerToken)  ;
+            if(uid_string == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
+            Long uid = Long.parseLong(uid_string);
             Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
             User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= comment.getUserLikeComment();
-            likeSet.remove(user);
+            if(likeSet.contains(user)){
+                likeSet.remove(user);
+            }
             comment.setUserLikeComment(likeSet);
             comment.setLikeCount((long) likeSet.size());
             commentRepository.save(comment);
@@ -114,13 +130,17 @@ public class LikeController {
 
     @PutMapping("/reply/like")
     public ResponseEntity<String> likeReply(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("replyId") Long replyId) {
-        String bearerToken = authorizationHeader.replace("Bearer ", "");
-        Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try {
+            String bearerToken = authorizationHeader.replace("Bearer ", "");
+            String uid_string =jwt.extractUID(bearerToken)  ;
+            if(uid_string == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
+            Long uid = Long.parseLong(uid_string);
             Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new ReplyNotFoundException(replyId));
             User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= reply.getUserLikeReply();
-            likeSet.add(user);
+            if(!likeSet.contains(user)){
+                likeSet.add(user);
+            }
             reply.setUserLikeReply(likeSet);
             reply.setLikeCount((long) likeSet.size());
             replyRepository.save(reply);
@@ -133,13 +153,17 @@ public class LikeController {
 
     @PutMapping("/reply/unlike")
     public ResponseEntity<String> unlikeReply(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("replyId") Long replyId) {
-        String bearerToken = authorizationHeader.replace("Bearer ", "");
-        Long uid = Long.parseLong(jwt.extractUID(bearerToken));
         try {
+            String bearerToken = authorizationHeader.replace("Bearer ", "");
+            String uid_string =jwt.extractUID(bearerToken)  ;
+            if(uid_string == null) {return new ResponseEntity<>("Authorization is NULL", HttpStatus.UNAUTHORIZED);}
+            Long uid = Long.parseLong(uid_string);
             Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new ReplyNotFoundException(replyId));
             User user = userRepository.findById(uid).orElseThrow(()->new UserNotFoundException(uid));
             Set<User> likeSet= reply.getUserLikeReply();
-            likeSet.remove(user);
+            if(likeSet.contains(user)){
+                likeSet.remove(user);
+            }
             reply.setUserLikeReply(likeSet);
             reply.setLikeCount((long) likeSet.size());
             replyRepository.save(reply);
