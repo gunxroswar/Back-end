@@ -50,7 +50,7 @@ public class LikeController {
             likeSet.add(user);
             post.setUserLikePost(likeSet);
             post.setLikeCount((long) likeSet.size());
-            postRepository.save(post);
+            postRepository.saveAndFlush(post);
             return new ResponseEntity<>("Post with ID " + postId + " is liked", HttpStatus.OK);
 
         } catch (PostNotFoundException|UserNotFoundException e  ) {
@@ -70,7 +70,7 @@ public class LikeController {
             likeSet.remove(user);
             post.setUserLikePost(likeSet);
             post.setLikeCount((long) likeSet.size());
-            postRepository.save(post);
+            postRepository.saveAndFlush(post);
             return new ResponseEntity<>("Post with ID " + postId + " is unliked", HttpStatus.OK);
 
         } catch (PostNotFoundException|UserNotFoundException e  ) {
@@ -91,7 +91,7 @@ public class LikeController {
             likeSet.add(user);
             comment.setUserLikeComment(likeSet);
             comment.setLikeCount((long) likeSet.size());
-            commentRepository.save(comment);
+            commentRepository.saveAndFlush(comment);
             return new ResponseEntity<>("Comment with ID " + commentId + " is liked", HttpStatus.OK);
 
         } catch (CommentNotFoundException | UserNotFoundException e  ) {
@@ -112,7 +112,7 @@ public class LikeController {
             likeSet.remove(user);
             comment.setUserLikeComment(likeSet);
             comment.setLikeCount((long) likeSet.size());
-            commentRepository.save(comment);
+            commentRepository.saveAndFlush(comment);
             return new ResponseEntity<>("Comment with ID " + commentId + " is liked", HttpStatus.OK);
 
         } catch (CommentNotFoundException | UserNotFoundException e  ) {
@@ -133,7 +133,7 @@ public class LikeController {
             likeSet.add(user);
             reply.setUserLikeReply(likeSet);
             reply.setLikeCount((long) likeSet.size());
-            replyRepository.save(reply);
+            replyRepository.saveAndFlush(reply);
             return new ResponseEntity<>("Reply with ID " + replyId + " is liked", HttpStatus.OK);
 
         } catch (ReplyNotFoundException | UserNotFoundException e  ) {
@@ -154,7 +154,7 @@ public class LikeController {
             likeSet.remove(user);
             reply.setUserLikeReply(likeSet);
             reply.setLikeCount((long) likeSet.size());
-            replyRepository.save(reply);
+            replyRepository.saveAndFlush(reply);
             return new ResponseEntity<>("Reply with ID " + replyId + " is unliked", HttpStatus.OK);
 
         } catch (ReplyNotFoundException | UserNotFoundException e  ) {
