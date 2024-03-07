@@ -9,7 +9,6 @@ import lombok.Setter;
 @Data
 public class createReply {
     private String commentID;
-    private String topic;
+
     private String detail;
-    private String cookie;
 }

@@ -9,7 +9,7 @@ import lombok.Setter;
 public class editComment {
     private String commentID;
     private String postID;
-    private String topic;
+
     private String detail;
     private String cookie;
 }

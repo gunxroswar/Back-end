@@ -48,7 +48,6 @@ public class ReplyController {
         sendBack.append("{");
         sendBack.append("\"ReplyID\":\"").append(inputReply.getReplyId()).append("\",");
         sendBack.append("\"displayName\":\"").append(ownerName).append("\",");
-        sendBack.append("\"topic\":\"").append(inputReply.getTopic()).append("\",");
         sendBack.append("\"LikeAmount\":\"").append(inputReply.getLikeCount()).append("\",");
         sendBack.append("\"isLike\":\"").append(isLike).append("\",");
         sendBack.append("\"hasVerify\":\"").append(inputReply.getIsVerify()).append("\",");
@@ -80,7 +79,7 @@ public class ReplyController {
     public ResponseEntity<String> getReply(@RequestParam("replyId") Long id, @RequestHeader(value = "Authorization") String authorizationHeader){
         User user = getUserFromAuthHeader(authorizationHeader);
         Optional<Reply> replyOpt = replyRepository.findById(id);
-        if(replyOpt.isEmpty()) return new ResponseEntity<>("[]", HttpStatus.NOT_FOUND);
+        if(replyOpt.isEmpty()) return new ResponseEntity<>("Reply not found with "+id, HttpStatus.NOT_FOUND);
         String reply = "[" + replyJSONBuilder(replyOpt.get(), user) + "]";
 
         return new ResponseEntity<>(reply, HttpStatus.OK);
@@ -95,8 +94,7 @@ public class ReplyController {
         Reply newReply = new Reply();
         Long replyId = replyRepository.findMaxId()+1L;
         Optional<Comment> comment = commentRepository.findById(Long.parseLong(info.getCommentID()));
-        if(comment.isEmpty()) return new ResponseEntity<>("???", HttpStatus.BAD_REQUEST);
-        String topic = info.getTopic();
+        if(comment.isEmpty()) return new ResponseEntity<>("Comment not found with "+Long.parseLong(info.getCommentID()), HttpStatus.NOT_FOUND);
         String detail = info.getDetail();
         Long likeCount = 0L;
         Boolean anonymous = false;
@@ -109,7 +107,6 @@ public class ReplyController {
         newReply.setReplyId(replyId);
         newReply.setComment(comment.get());
         newReply.setUser(user);
-        newReply.setTopic(topic);
         newReply.setDetail(detail);
         newReply.setLikeCount(likeCount);
         newReply.setAnonymous(anonymous);
@@ -118,7 +115,7 @@ public class ReplyController {
         newReply.setCreateAt(createAt);
         newReply.setUpdateAt(updateAt);
         newReply.setUserLikeReply(userLikeReply);
-
+        replyRepository.save(newReply);
         return new ResponseEntity<>("OK", HttpStatus.CREATED);
     }
 
@@ -131,10 +128,8 @@ public class ReplyController {
         Long editReplyID = Long.getLong(info.getReplyID());
         Reply editReply = replyRepository.findById(editReplyID).orElseThrow(()->new ReplyNotFoundException(Long.getLong(info.getCommentID())));
         if(editReply.getUser() != user) return new ResponseEntity<String>("User don't own reply "+editReply.getReplyId(), HttpStatus.FORBIDDEN);
-        String topic = info.getTopic();
         String detail = info.getDetail();
         Date updateAt = new Date();
-        editReply.setTopic(topic);
         editReply.setDetail(detail);
         editReply.setUpdateAt(updateAt);
         replyRepository.save(editReply);

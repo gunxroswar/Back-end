@@ -11,7 +11,7 @@ import lombok.Setter;
 public class editReply {
     private String replyID;
     private String commentID;
-    private String topic;
+
     private String detail;
     private String cookie;
 }

@@ -208,7 +208,7 @@ public class PostController {
     public ResponseEntity<String> getPost(@RequestParam("postId") Long id, @RequestHeader(value = "Authorization") String authorizationHeader){
         User user = getUserFromAuthHeader(authorizationHeader);
         Optional<Post> postOpt = postRepository.findById(id);
-        System.out.println(postOpt.get());
+//        System.out.println(postOpt.get());
         Post temp = postOpt.orElse(null);
         StringBuilder sendBack = new StringBuilder();
         if(temp==null) sendBack.append("[]");
@@ -268,28 +268,12 @@ public class PostController {
             PageRequest pageSize10AndSortByCreateAt=PageRequest.of(pageId, 10, Sort.by("createAt"));
             List<Post> search = postRepository.findByUser(user, pageSize10AndSortByCreateAt).getContent();
             StringBuilder sendBack = new StringBuilder();
-            StringBuilder subSendBack = new StringBuilder();
-            //id, user.profile_name , topic, detail , create_at, like_count, has_verify, '[]' as taglist, comment.commentCount
-            for (int i = 0; i < search.size(); i++) {
-                Post currentPost = search.get(i);
-                Long commentCount = commentRepository.countByPost(search.get(i));
-                subSendBack.append("{");
-                subSendBack.append("\"id\":\"").append(currentPost.getPostId()).append("\",");
-                //subSendBack.append("\"profile_name\":\"").append(currentPost.getUser().getUsername()).append("\",");
-                subSendBack.append("\"profile_name\":\"").append(currentPost.getUser()).append("\",");
-                subSendBack.append("\"topic\":\"").append(currentPost.getTopic()).append("\",");
-                subSendBack.append("\"detail\":\"").append(currentPost.getDetail()).append("\",");
-                subSendBack.append("\"create_at\":\"").append(currentPost.getCreateAt()).append("\",");
-                subSendBack.append("\"like_count\":\"").append(currentPost.getLikeCount()).append("\",");
-                subSendBack.append("\"has_verify\":\"").append(currentPost.getHasVerify()).append("\",");
-                Set<TagName> tagName = tagRepository.findByPostWithTags(currentPost);
-                subSendBack.append("\"taglist\":\"").append(tagSetToJSONTag(tagName)).append("\",");
-                subSendBack.append("\"commentCount\":\"").append(commentCount.toString()).append("\"");
-                subSendBack.append("},");
-                sendBack.append(subSendBack);
-                subSendBack.delete(0, subSendBack.length());
+            for(int i = 0; i < search.size(); i++) {
+//            System.out.println(search.get(i));
+                sendBack.append(postJSONBuilder(search.get(i), user));
+                sendBack.append(",");
             }
-            if (!sendBack.isEmpty()) sendBack.deleteCharAt(sendBack.length() - 1);
+            if(!sendBack.isEmpty()) sendBack.deleteCharAt(sendBack.length()-1);
 
             return new ResponseEntity<>("[" + sendBack + "]", HttpStatus.OK);
         }catch (Exception e) {
