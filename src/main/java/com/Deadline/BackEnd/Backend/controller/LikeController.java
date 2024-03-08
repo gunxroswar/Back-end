@@ -120,6 +120,7 @@ public class LikeController {
             likeSet.remove(user);
             comment.setUserLikeComment(likeSet);
             comment.setLikeCount((long) likeSet.size());
+            commentRepository.deleteLike(comment.getCommentId(),user.getUid());
             commentRepository.saveAndFlush(comment);
             return new ResponseEntity<>("Comment with ID " + commentId + " is liked", HttpStatus.OK);
 
@@ -164,6 +165,7 @@ public class LikeController {
             likeSet.remove(user);
             reply.setUserLikeReply(likeSet);
             reply.setLikeCount((long) likeSet.size());
+            replyRepository.deleteLike(reply.getReplyId(),user.getUid());
             replyRepository.saveAndFlush(reply);
             return new ResponseEntity<>("Reply with ID " + replyId + " is unliked", HttpStatus.OK);
 
